@@ -8,7 +8,7 @@ enemy class -> human class를 상속하여 여기에 ai를 추가함 / 타입에
     근거리 -> 일정거리 접근하면 캐릭터 공격모션과 동일하게 공격
     원거리 -> 일정거리 벌리고 공격 / 활 쏘는 모션은 위의 human class를 상속하여 모션을 오버라이딩함
         화살은 일직선으로 -> 캐릭터들은 점프해서 회피함.
-boss class -> enemy class의 모션, 스텟, ai를 오버라이딩해서 짬. 공격 형태는 일단 근거리로 책정(가능하면 근/원거리 둘다 할 의향이 있음)
+boss class -> enemy class의 모션, 스텟, ai를 오버라이딩해서 짬. 공격 형태는 근/원거리 둘다 가능하도록
 
 맵 / 규칙 설계
 벨트 스크롤 형식이 아닌 스테이지 형식(적이 모두 죽으면 다음 스테이지로 넘어감)
@@ -19,7 +19,6 @@ boss class -> enemy class의 모션, 스텟, ai를 오버라이딩해서 짬. �
 from abc import *
 import random
 import pygame
-random = randran
 
 pygame.init()
 
@@ -60,21 +59,29 @@ class Human(metaclass=ABCMeta):
         pass
     
     @abstractmethod
-    def attack(self): #공격
+    def sting(self): #찌르기
         pass
 
     @abstractmethod
-    def get_attack(self): #
+    def slash(self): # 베기
+        pass
+
+    @abstractmethod
+    def get_attack(self): #???
         pass
 
     @abstractmethod
     def rigidity(self): #경직
         pass
 
+    @abstractmethod
+    def dead(self): #사망
+        pass
+
 class Character(Human):
 
     def __init__(self):
-        super().__init__(hp = 100,) #상속
+        super().__init__(hp = 100, mp = 0, atk = 30, arm = 10, cri = 0.1) #상속
 
     def control(self, keys): #기본적인 조작법
 
@@ -89,23 +96,75 @@ class Character(Human):
         else:
             self.stop()
 
+
         if pygame.K_UP in keys and self.onGround:
             self.jump()
 
-    def attack(self):
+        else:
+            self.stop()
+
+
+        if pygame.K_x in keys:
+            self.sting()
+        
+        elif pygame.K_Z in keys:
+            self.slash()
+        
+        else:
+            self.stop()
+
+    def dead(self):
+        if self.hp == 0:
+            self.dead()
+            return 'YOU DIED'
+        
+
+
+    def sting(self):
         while (self.hp = 0):
             self.hp - (self.arm - self.atk)
 
             if (random.random() <= self.cri):
-                self.atk * 2
+                self.atk * 2    
                 self.hp - (self.arm - self.atk * 2)
 
-    
+    def slash(self):
+        while (self.hp = 0):
+            self.hp - (self.arm - self.atk)
 
-class Enemy(Human):
+            if (random.random() <= self.cri):
+                self.atk * 2    
+                self.hp - (self.arm - self.atk * 2)
 
-    def ai(self):
-        super().
 
-class Boss(Emeny):
 
+class Near_Enemy(Human): #근거리
+
+    def __init__(self):
+        super().__init__(hp = 1500, mp = 0, atk = 15, arm = 10, cri = 0)
+
+    def sting(self):
+        while (self.hp = 0):
+            self.hp - (self.arm - self.atk)
+
+    def slash(self):
+        while (self.hp = 0):
+            self.hp - (self.arm - self.atk)
+
+    def near_ai(self): #이동 메서드 추가
+
+
+class Distance_Enemy(Human): #원거리
+
+    def __init__(self):
+        super().__init__(hp = 750, mp = 0, atk = 20, arm = 5, cri = 0)
+
+    def distance_ai(self): #모션은 기존의 찌르기/베기 모션을 오버라이딩함.
+
+
+class Boss(Near_Enemy, Distance_Enemy): #다중상속 -> 근/원거리 공격 포함
+
+    def __init__(self):
+        super().__init__()
+
+    def slash(slef):
