@@ -31,7 +31,7 @@ Vright = 'view_right'
 
 # human 클래스에 character, enemy가 공유함
 # 
-class Human(metaclass=ABCMeta):      
+class Human(metaclass=ABCMeta):
 
     @abstractmethod
     def __init__(self, hp = 100, mp = 0, atk = 0, arm = 0, cri = 0.1): #기본 스텟/몹, 캐릭터의 위치 설계
@@ -67,7 +67,7 @@ class Human(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_attack(self): #???
+    def get_attack(self): #피격판정
         pass
 
     @abstractmethod
@@ -114,11 +114,7 @@ class Character(Human):
             self.stop()
 
     def dead(self):
-        if self.hp == 0:
-            self.dead()
-            return 'YOU DIED'
-        
-
+		pass
 
     def sting(self):
         while (self.hp = 0):
