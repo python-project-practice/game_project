@@ -19,6 +19,7 @@ boss class -> enemy class의 모션, 스텟, ai를 오버라이딩해서 짬. �
 from abc import *
 import random
 import pygame
+import vector
 
 pygame.init()
 
@@ -42,7 +43,7 @@ class Human(metaclass=ABCMeta):
         self.arm = arm
         self.cri = cri
 
-        self.position = 0  #위치
+        self.position = vector(0, 0)  #위치
         self.motion = 0  #모션
         self.viewdir = Vright #오른쪽
         self.onGround = True #캐릭터가 땅 위에 존재
@@ -57,6 +58,10 @@ class Human(metaclass=ABCMeta):
 
     @abstractmethod
     def right(self): #우측 이동
+        pass
+
+    @abstractmethod
+    def walk(self):
         pass
 
     @abstractmethod
@@ -117,34 +122,58 @@ class Character(Human):
         
         else:
             self.stop()
-'''
-    def dead(self): #캐릭터/몹 사망
-        self.sprite = Character.DEATH #미구현
+
+    def sting(self, Near_Enemy, Distance_Enemy, Boss):
+        if Near_Enemy():
+            return Near_Enemy.hp - (Near_Enemy.arm - self.atk)
+            if (random.random() <= self.cri):
+                return Near_Enemy.hp - (Near_Enemy.arm - self.atk * 2)
+
+        elif Distance_Enemy():
+            return Distance_Enemy.hp - (Distance.arm - self.atk)
+            if (random.random() <= self.cri):
+               Distance_Enemy.hp - (Distance.arm - self.atk * 2) 
+
+        elif Boss():
+            return Boss.hp - (Boss.arm - self.atk)
+            if (random.random() <= self.cri):
+                Boss.hp - (Boss.arm - self.atk * 2)
+
+    def slash(self, Near_Enemy, Distance_Enemy, Boss):
+        if Near_Enemy():
+            return Near_Enemy.hp - (Near_Enemy.arm - self.atk)
+            if (random.random() <= self.cri):
+                return Near_Enemy.hp - (Near_Enemy.arm - self.atk * 2)
+
+        elif Distance_Enemy():
+            return Distance_Enemy.hp - (Distance.arm - self.atk)
+            if (random.random() <= self.cri):
+               Distance_Enemy.hp - (Distance.arm - self.atk * 2) 
+
+        elif Boss():
+            return Boss.hp - (Boss.arm - self.atk)
+            if (random.random() <= self.cri):
+                Boss.hp - (Boss.arm - self.atk * 2)
 
 
-        
-
-'''
 class Near_Enemy(Human): #근거리
 
     def __init__(self):
         super().__init__(hp = 1500, mp = 0, atk = 15, arm = 10, cri = 0)
 
-    def sting(self):
-        while (self.hp == 0):
-            Character().hp - (Character().arm - Near_Enemy().atk)
+    def sting(self, Character):
+        return Character.hp - (Character.arm - self.atk)
 
-    def slash(self):
-        while (self.hp == 0):
-            Character().hp - (Character().arm - Near_Enemy().atk)
+    def slash(self, Character):
+        return Character.hp - (Character.arm - self.atk)
 
     def get_attack(self):
-        if ()
 
-    def near_ai(self): #이동 메서드 추가
-        distance = ((Character().position.x - Near_Enemy().position.x) ** 2 + (Character().position.y - Near_Enemy().position.y) ** 2) ** 0.5 
+
+    def near_ai(self, Character): #이동 메서드 추가
+        dist()
         if (distance < 100):
-            Near_Enemy().slash() or Near_Enemy().sting()
+            self.slash() or self.sting()
         else:
             distance -= 10 #거리가 가까워짐
 
@@ -154,12 +183,10 @@ class Distance_Enemy(Human): #원거리
     def __init__(self):
         super().__init__(hp = 750, mp = 0, atk = 20, arm = 5, cri = 0)
     
-    def sting(self): #활쏘기로 오버라이딩
-        while (self.hp == 0):
-            Character().hp - (Character().arm - Distance_Enemy().atk)
+    def sting(self ,Character): #활쏘기로 오버라이딩
+        return Character.hp - (Character.arm - self.atk)
 
-
-    def distance_ai(self): #모션은 기존의 찌르기/베기 모션을 오버라이딩함.
+    def distance_ai(self, Character): #모션은 기존의 찌르기/베기 모션을 오버라이딩함.
         distance = ((Character().position.x - Near_Enemy().position.x) ** 2 + (Character().position.y - Near_Enemy().position.y) ** 2) ** 0.5
         if (distance < 200):
             distance += 20
