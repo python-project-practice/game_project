@@ -18,9 +18,9 @@ boss class -> enemy class의 모션, 스텟, ai를 오버라이딩해서 짬. �
 '''
 from abc import *
 import random
-import pygame
-
-pygame.init()
+from pygame.locals import *
+import draw
+from vector import vector
 
 
 
@@ -31,8 +31,13 @@ Jump = 'jump'
 Vleft = 'view_left'
 Vright = 'view_right'
 
+GROUND_HEIGHT = 350
+GRAVITY_CONSTANT = vector(0, 4.0) # gain speed (rightward , downward) px per frame
+MOVE_SPEED = 6
+JUMP_SPEED = -40
+
 # human 클래스에 character, enemy가 공유함
-class Human(metaclass=ABCMeta):      
+class Human(metaclass=ABCMeta):
 
     @abstractmethod
     def __init__(self, hp = 100, mp = 0, atk = 0, arm = 0, cri = 0.1): #기본 스텟/몹, 캐릭터의 위치 설계
@@ -84,47 +89,95 @@ class Human(metaclass=ABCMeta):
         pass
 
 class Character(Human):
+    def __init__(self, hp = 100, mp = 0, atk = 0, arm = 0, cri = 0.1): #기본 스텟/몹, 캐릭터의 위치 설계
+        self.hp = hp
+        self.mp = mp
+        self.atk = atk
+        self.arm = arm
+        self.cri = cri
 
-    def __init__(self):
-        super().__init__(hp = 100, mp = 0, atk = 30, arm = 10, cri = 0.1) #상속
+        self.pos = vector(60, GROUND_HEIGHT)  #위치
+        self.speed = vector(0, 0) #속도. 매 프레임마다 위치+= 속도
+        self.motion = 0  #모션
+        self.viewdir = Vright #오른쪽
+        self.onGround = True #캐릭터가 땅 위에 존재
 
+        self.sprite = None
+        self.static_sprite = draw.sprite(['image/char/static.png'], True, 2, self.pos)
+        self.walk_sprite = draw.sprite(['image/char/walk-' + str(i) + '.png' for i in range(1,4)],True, 5, self.pos)
+
+        self.stop()
+        
     def control(self, keys): #기본적인 조작법
-
-        if pygame.K_RIGHT in keys:
+        if keys[K_RIGHT]:
             self.right()
-            self.walk()
 
-        elif pygame.K_LEFT in keys:
+        elif keys[K_LEFT]:
             self.left()
-            self.walk()
 
         else:
             self.stop()
 
 
-        if pygame.K_UP in keys and self.onGround:
+        if keys[K_UP]:
             self.jump()
 
-        else:
-            self.stop()
-
-
-        if pygame.K_x in keys:
+        if keys[K_x]:
             self.sting()
         
-        elif pygame.K_z in keys:
+        elif keys[K_z]:
             self.slash()
         
         else:
-            self.stop()
-'''
-    def dead(self): #캐릭터/몹 사망
-        self.sprite = Character.DEATH #미구현
+            pass
 
+    def jump(self): #점프
+        if self.onGround:
+            self.onGround = False
+            self.speed.y = JUMP_SPEED
+            self.sprite = self.static_sprite
 
+    def left(self): #좌측 이동
+        self.speed.x = -MOVE_SPEED
+        self.sprite = self.walk_sprite
+
+    def right(self): #우측 이동
+        self.speed.x = +MOVE_SPEED
+        self.sprite = self.walk_sprite
+
+    def stop(self):
+        self.speed.x = 0
+        self.sprite = self.static_sprite
+    
+    def sting(self): #찌르기
+        pass
+
+    def slash(self): # 베기
+        pass
+
+    def get_attack(self): #피격 판정
+        pass
+
+    def rigidity(self): #경직
+        pass
+
+    def dead(self): #사망
+        pass
+
+    def update(self):
+        self.sprite.move(self.pos)
+        self.sprite.update()
+        self.pos += self.speed
+        if not self.onGround:
+            self.speed += GRAVITY_CONSTANT
+        if(self.pos.y > GROUND_HEIGHT):
+            self.onGround = True
+            self.pos.y = GROUND_HEIGHT
+            self.speed = vector(0, 0)
         
+    def draw(self, surf):
+        self.sprite.draw(surf)
 
-'''
 class Near_Enemy(Human): #근거리
 
     def __init__(self):
@@ -139,7 +192,8 @@ class Near_Enemy(Human): #근거리
             Character().hp - (Character().arm - Near_Enemy().atk)
 
     def get_attack(self):
-        if ()
+        if (True):
+            pass
 
     def near_ai(self): #이동 메서드 추가
         distance = ((Character().position.x - Near_Enemy().position.x) ** 2 + (Character().position.y - Near_Enemy().position.y) ** 2) ** 0.5 
@@ -172,5 +226,5 @@ class Boss(Near_Enemy, Distance_Enemy): #다중상속 -> 근/원거리 공격 �
         super().__init__()
 
     def slash(self):
-        while
-'''
+        while True:
+            pass
