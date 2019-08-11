@@ -100,8 +100,9 @@ class Character(Human):
         super().__init__(hp = 100, mp = 0, atk = 30, arm = 10, cri = 0.1) #상속
 
         self.sprite = None
-        self.static_sprite = draw.sprite(['image/char/static.png'], True, 2, self.pos)
-        self.walk_sprite = draw.sprite(['image/char/walk-' + str(i) + '.png' for i in range(1,4)],True, 5, self.pos)
+        self.position = vector(60, GROUND_HEIGHT)
+        self.static_sprite = draw.sprite(['image/char/static.png'], True, 2, self.position)
+        self.walk_sprite = draw.sprite(['image/char/walk-' + str(i) + '.png' for i in range(1,4)],True, 12, self.position)
 
         self.stop()
         
@@ -141,7 +142,7 @@ class Character(Human):
 
     def right(self): #우측 보기?
     	self.viewdir = Vright
-        
+
     def walk(self): #보고 있는 방향으로 이동?
     	if(self.viewdir == Vleft):
     		self.speed.x = -MOVE_SPEED
@@ -168,15 +169,21 @@ class Character(Human):
     def dead(self): #사망
         pass
 
+    def slash(self):
+        pass
+
+    def sting(self):
+        pass
+
     def update(self):
-        self.sprite.move(self.pos)
+        self.sprite.move(self.position)
         self.sprite.update()
-        self.pos += self.speed
+        self.position += self.speed
         if not self.onGround:
             self.speed += GRAVITY_CONSTANT
-        if(self.pos.y > GROUND_HEIGHT):
+        if(self.position.y > GROUND_HEIGHT):
             self.onGround = True
-            self.pos.y = GROUND_HEIGHT
+            self.position.y = GROUND_HEIGHT
             self.speed = vector(0, 0)
         
     def draw(self, surf):
@@ -187,74 +194,75 @@ class Near_Enemy(Human): #근거리
     def __init__(self):
         Human.__init__(hp = 800, mp = 0, atk = 15, arm = 10, cri = 0)
 
-    def sting(self, Character()):
-        return Character.hp - (Character.arm - self.atk)
+    def sting(self, other):
+        return other.hp - (other.arm - self.atk)
 
-    def slash(self, Character()):
-        return Character.hp - (Character.arm - self.atk)
+    def slash(self, other):
+        return other.hp - (other.arm - self.atk)
 
-    def get_attack(self, Character()):
-        if Character.slash() or Character.sting():
+    def get_attack(self, other):
+        if other.slash() or other.sting():
             return #피격 상태 이미지로 출력 -> 추후에 경직 시간(후딜레이) 고려해야 함!
 
-    def rigidity(self, Character()):
-        if Character.slash() or Character.sting():
+    def rigidity(self, other):
+        if other.slash() or other.sting():
             self.get_attack()
 
-    def near_ai(self, Character()): #이동 메서드 추가
+    def near_ai(self, other): #이동 메서드 추가
         dist()
         if (dist() < 100):
             self.slash() or self.sting()
         else:
-            dist() -= 10 #거리가 가까워짐
+            pass
+            #dist() -= 10 #거리가 가까워짐
 
     def dead(self):
-
+        pass
 
 class Distance_Enemy(Human): #원거리
 
     def __init__(self):
        Human.__init__(hp = 250, mp = 0, atk = 20, arm = 5, cri = 0)
     
-    def sting(self ,Character()): #활쏘기로 오버라이딩
-        return Character.hp - (Character.arm - self.atk)
+    def sting(self ,other): #활쏘기로 오버라이딩
+        return other.hp - (other.arm - self.atk)
 
-    def get_attack(self, Character()):
-        if Character.slash() or Character.sting():
+    def get_attack(self, other):
+        if other.slash() or other.sting():
             return #피격 상태 이미지 출력 -> 추후에 경직 시간(후딜레이)도 고려해야 함
 
-    def rigidity(self, Character()):
-        if Character.slash() or Character.sting():
+    def rigidity(self, other):
+        if other.slash() or other.sting():
             self.get_attack()
 
-    def distance_ai(self, Character()): #모션은 기존의 찌르기/베기 모션을 오버라이딩함.
+    def distance_ai(self, other): #모션은 기존의 찌르기/베기 모션을 오버라이딩함.
         dist()
         if (dist() < 200):
-            dist() += 20
+            dist += 20
         else:
             self.sting()
 
     def dead(self):
-
+        pass
 
 class Boss(Near_Enemy, Distance_Enemy): #다중상속 -> 근/원거리 공격 포함
 
     def __init__(self):
         Human.__init__(hp = 2000, mp = 0, atk = 25, arm = 10, cri = 0) #상속 코드 질문 다시 하기!!
 
-    def slash(self, Character()):
-        return Character.hp - (Character.arm - self.atk)
+    def slash(self, other):
+        return other.hp - (other.arm - self.atk)
 
-    def sting(self, Character()):
-        return Character.hp -(Character.arm - self.atk)
+    def sting(self, other):
+        return other.hp -(other.arm - self.atk)
 
-    def get_attack(self, Character()):
-        if Character.slash or Character.sting:
+    def get_attack(self, other):
+        if other.slash or other.sting:
             return
 
     def rigidity(self):
-        if Character.slash or Character.sting:
-            self.get_attack
+        if other.slash or other.sting:
+            self.get_attack()
 
     def boss_ai(self): #복잡해지면 근/원거리 ai로 나눌거다.
         dist()
@@ -266,5 +274,4 @@ class Boss(Near_Enemy, Distance_Enemy): #다중상속 -> 근/원거리 공격 �
             self.stop
 
     def dead(self):
-        
-
+        pass
