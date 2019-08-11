@@ -1,3 +1,5 @@
+"""draw image or sprite using pygame."""
+
 import pygame
 from vector import vector
 import random
@@ -16,7 +18,6 @@ class image:
         return self.image.get_size()
 
     def move(self, pos):
-        assert len(pos) == 2
         # assert pos[0] > 0 and pos[1] > 0
         self.pos = pos
 
@@ -24,14 +25,15 @@ class image:
         surf.blit(self.image, (self.pos.x, self.pos.y))
 
 class sprite:
-    def __init__(self, imagenamelist = [], alpha=False, pos=(0,0)):
+    def __init__(self, imagenamelist = [], alpha=False, update_period = 1, pos=(0,0)):
         if alpha is True:
             self.imagelist = [pygame.image.load(i).convert_alpha() for i in imagenamelist]
         else:
             self.imagelist = [pygame.image.load(i) for i in imagenamelist]
-        print(self.imagelist)
         self.pos = vector(*pos)
-        self._frame = 0
+        self._picindex = 0 # 몇 번째 사진을 비출 것인지
+        self.update_period = update_period # 몇 프레임마다 사진을 갱신할 것인지
+        self._frame = 0 # 현재 생성 후 몇 프레임이 지났는지
         self._len = len(self.imagelist)
 
     def __len__(self):
@@ -44,14 +46,15 @@ class sprite:
         return self.imagelist[0].get_size()
 
     def draw(self, surf):
-        surf.blit(self.imagelist[self._frame], (self.pos.x, self.pos.y))
+        surf.blit(self.imagelist[self._picindex], (self.pos.x, self.pos.y))
 
     def move(self, pos):
-        assert len(pos) == 2
         self.pos = vector(*pos)
 
     def update(self):
-        self._frame = (self._frame + 1) % len(self)
+        self._frame += 1
+        if(self._frame % self.update_period == 0):
+            self._picindex = (self._picindex + 1) % len(self)
 
 class painter:
     def __init__(self, surf, weather=None):

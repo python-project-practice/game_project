@@ -1,2 +1,6 @@
 
 *.pyc
+.vs/slnx.sqlite
+.vs/ProjectSettings.json
+.vs/game_project/v16/.suo
+.vs/VSWorkspaceState.json
