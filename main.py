@@ -22,10 +22,10 @@ y는 아래 방향이 크게, x는 오른 쪽이 크게.
 
 
 '''
-HEIGHT, WIDTH = 800, 600
+WIDTH, HEIGHT = 800, 600
 
 pygame.init()
-DISP = pygame.display.set_mode((HEIGHT, WIDTH))
+DISP = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("연습")
 painter = draw.painter(DISP)
 player = Character()

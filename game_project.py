@@ -31,10 +31,15 @@ Jump = 'jump'
 Vleft = 'view_left'
 Vright = 'view_right'
 
+MOVE_SPEED = 3
 GROUND_HEIGHT = 350
-GRAVITY_CONSTANT = vector(0, 4.0) # gain speed (rightward , downward) px per frame
-MOVE_SPEED = 6
-JUMP_SPEED = -40
+
+temp_t = 120
+temp_h = -150
+
+
+JUMP_SPEED = 4 * temp_h / temp_t
+GRAVITY_CONSTANT = vector(0, -8 * temp_h / (temp_t ** 2)) # gain speed (rightward , downward) px per frame
 
 # human 클래스에 character, enemy가 공유함
 class Human(metaclass=ABCMeta):
@@ -90,22 +95,17 @@ class Human(metaclass=ABCMeta):
 
 class Character(Human):
     def __init__(self, hp = 100, mp = 0, atk = 0, arm = 0, cri = 0.1): #기본 스텟/몹, 캐릭터의 위치 설계
-        self.hp = hp
-        self.mp = mp
-        self.atk = atk
-        self.arm = arm
-        self.cri = cri
-
-        self.pos = vector(60, GROUND_HEIGHT)  #위치
+        super().__init__(hp = 100, mp = 0, atk = 0, arm = 0, cri = 0.1)
+        self.position = vector(60, GROUND_HEIGHT)
         self.speed = vector(0, 0) #속도. 매 프레임마다 위치+= 속도
+
         self.motion = 0  #모션
         self.viewdir = Vright #오른쪽
         self.onGround = True #캐릭터가 땅 위에 존재
 
         self.sprite = None
-        self.static_sprite = draw.sprite(['image/char/static.png'], True, 2, self.pos)
-        self.walk_sprite = draw.sprite(['image/char/walk-' + str(i) + '.png' for i in range(1,4)],True, 5, self.pos)
-
+        self.static_sprite = draw.sprite(['image/char/static.png'], True, 2, self.position)
+        self.walk_sprite = draw.sprite(['image/char/walk-' + str(i) + '.png' for i in range(1,4)], True, 12, self.position)
         self.stop()
         
     def control(self, keys): #기본적인 조작법
@@ -148,7 +148,7 @@ class Character(Human):
     def stop(self):
         self.speed.x = 0
         self.sprite = self.static_sprite
-    
+
     def sting(self): #찌르기
         pass
 
@@ -165,14 +165,15 @@ class Character(Human):
         pass
 
     def update(self):
-        self.sprite.move(self.pos)
+        self.position += self.speed
+        self.sprite.move(self.position)
         self.sprite.update()
-        self.pos += self.speed
+
         if not self.onGround:
             self.speed += GRAVITY_CONSTANT
-        if(self.pos.y > GROUND_HEIGHT):
+        if(self.position.y > GROUND_HEIGHT):
             self.onGround = True
-            self.pos.y = GROUND_HEIGHT
+            self.position.y = GROUND_HEIGHT
             self.speed = vector(0, 0)
         
     def draw(self, surf):
@@ -181,19 +182,16 @@ class Character(Human):
 class Near_Enemy(Human): #근거리
 
     def __init__(self):
-        super().__init__(hp = 1500, mp = 0, atk = 15, arm = 10, cri = 0)
+        super().__init__(hp = 800, mp = 0, atk = 15, arm = 10, cri = 0)
 
-    def sting(self):
-        while (self.hp == 0):
-            Character().hp - (Character().arm - Near_Enemy().atk)
+    def sting(self, other):
+        pass
 
     def slash(self):
-        while (self.hp == 0):
-            Character().hp - (Character().arm - Near_Enemy().atk)
+        pass
 
     def get_attack(self):
-        if (True):
-            pass
+        pass
 
     def near_ai(self): #이동 메서드 추가
         distance = ((Character().position.x - Near_Enemy().position.x) ** 2 + (Character().position.y - Near_Enemy().position.y) ** 2) ** 0.5 
@@ -206,8 +204,8 @@ class Near_Enemy(Human): #근거리
 class Distance_Enemy(Human): #원거리
 
     def __init__(self):
-        super().__init__(hp = 750, mp = 0, atk = 20, arm = 5, cri = 0)
-    
+       super().__init__(hp = 250, mp = 0, atk = 20, arm = 5, cri = 0)
+
     def sting(self): #활쏘기로 오버라이딩
         while (self.hp == 0):
             Character().hp - (Character().arm - Distance_Enemy().atk)
@@ -223,8 +221,18 @@ class Distance_Enemy(Human): #원거리
 class Boss(Near_Enemy, Distance_Enemy): #다중상속 -> 근/원거리 공격 포함
 
     def __init__(self):
-        super().__init__()
+        super().__init__(hp = 2000, mp = 0, atk = 25, arm = 10, cri = 0) #상속 코드 질문 다시 하기!!
 
-    def slash(self):
-        while True:
-            pass
+    def slash(self, other):
+        return other.hp - (other.arm - self.atk)
+
+    def sting(self, other):
+        return other.hp -(other.arm - self.atk)
+
+    def get_attack(self, other):
+        if other.slash or other.sting:
+            return
+
+    def rigidity(self):
+        if other.slash or other.sting:
+            self.get_attack()
