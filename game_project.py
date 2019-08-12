@@ -9,6 +9,7 @@ enemy class -> human class를 상속하여 여기에 ai를 추가함 / 타입에
     원거리 -> 일정거리 벌리고 공격 / 활 쏘는 모션은 위의 human class를 상속하여 모션을 오버라이딩함
         화살은 일직선으로 -> 캐릭터들은 점프해서 회피함.
 boss class -> enemy class의 모션, 스텟, ai를 오버라이딩해서 짬. 공격 형태는 근/원거리 둘다 가능하도록
+    ++추후 걷는 모션 / 공격 모션 / 경직 모션 등 선딜레이, 후딜레이 개념을 정의해야 함!
 
 맵 / 규칙 설계
 벨트 스크롤 형식이 아닌 스테이지 형식(적이 모두 죽으면 다음 스테이지로 넘어감)
@@ -22,7 +23,7 @@ from pygame.locals import *
 import draw
 from vector import vector
 
-
+#++ 히트박스 클래스 고려하여 프로그래밍 ㄱㄱ
 
 Stop = 'stop'
 Walk = 'walk'
@@ -52,7 +53,8 @@ class Human(metaclass=ABCMeta):
         self.arm = arm
         self.cri = cri
 
-        self.position = 0  #위치
+        self.position = vector(0, 0)  #위치
+        self.speed = vector(0, 0) #속도, 매 프레임마다 위치+= 속도
         self.motion = 0  #모션
         self.viewdir = Vright #오른쪽
         self.onGround = True #캐릭터가 땅 위에 존재
@@ -62,15 +64,19 @@ class Human(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def left(self): #좌측 이동
+    def left(self): #좌측 방향
         pass
 
     @abstractmethod
-    def right(self): #우측 이동
+    def right(self): #우측 방향
         pass
 
     @abstractmethod
-    def stop(self):
+    def walk(self): # 이동
+        pass
+
+    @abstractmethod
+    def stop(self): #멈춤/땅 위에 존재
         pass
     
     @abstractmethod
@@ -106,20 +112,23 @@ class Character(Human):
         self.sprite = None
         self.static_sprite = draw.sprite(['image/char/static.png'], True, 2, self.position)
         self.walk_sprite = draw.sprite(['image/char/walk-' + str(i) + '.png' for i in range(1,4)], True, 12, self.position)
+
         self.stop()
         
     def control(self, keys): #기본적인 조작법
         if keys[K_RIGHT]:
             self.right()
+            self.walk()
 
         elif keys[K_LEFT]:
             self.left()
+            self.walk()
 
         else:
             self.stop()
 
 
-        if keys[K_UP]:
+        if keys[K_UP] and self.onGround:
             self.jump()
 
         if keys[K_x]:
@@ -137,23 +146,22 @@ class Character(Human):
             self.speed.y = JUMP_SPEED
             self.sprite = self.static_sprite
 
-    def left(self): #좌측 이동
-        self.speed.x = -MOVE_SPEED
-        self.sprite = self.walk_sprite
+    def left(self): #좌측 보기?
+    	self.viewdir = Vleft
 
-    def right(self): #우측 이동
-        self.speed.x = +MOVE_SPEED
-        self.sprite = self.walk_sprite
+    def right(self): #우측 보기?
+    	self.viewdir = Vright
+
+    def walk(self): #보고 있는 방향으로 이동?
+    	if(self.viewdir == Vleft):
+    		self.speed.x = -MOVE_SPEED
+    	elif(self.viewdir == Vright):
+    		self.speed.x = MOVE_SPEED
+    	self.sprite = self.walk_sprite
 
     def stop(self):
         self.speed.x = 0
         self.sprite = self.static_sprite
-
-    def sting(self): #찌르기
-        pass
-
-    def slash(self): # 베기
-        pass
 
     def get_attack(self): #피격 판정
         pass
@@ -162,6 +170,12 @@ class Character(Human):
         pass
 
     def dead(self): #사망
+        pass
+
+    def slash(self):
+        pass
+
+    def sting(self):
         pass
 
     def update(self):
@@ -193,13 +207,20 @@ class Near_Enemy(Human): #근거리
     def get_attack(self):
         pass
 
-    def near_ai(self): #이동 메서드 추가
-        distance = ((Character().position.x - Near_Enemy().position.x) ** 2 + (Character().position.y - Near_Enemy().position.y) ** 2) ** 0.5 
-        if (distance < 100):
-            Near_Enemy().slash() or Near_Enemy().sting()
-        else:
-            distance -= 10 #거리가 가까워짐
+    def rigidity(self, other):
+        if other.slash() or other.sting():
+            self.get_attack()
 
+    def near_ai(self, other): #이동 메서드 추가
+        dist()
+        if (dist() < 100):
+            self.slash() or self.sting()
+        else:
+            pass
+            #dist() -= 10 #거리가 가까워짐
+
+    def dead(self):
+        pass
 
 class Distance_Enemy(Human): #원거리
 
@@ -210,13 +231,19 @@ class Distance_Enemy(Human): #원거리
         while (self.hp == 0):
             Character().hp - (Character().arm - Distance_Enemy().atk)
 
+    def rigidity(self, other):
+        if other.slash() or other.sting():
+            self.get_attack()
 
-    def distance_ai(self): #모션은 기존의 찌르기/베기 모션을 오버라이딩함.
-        distance = ((Character().position.x - Near_Enemy().position.x) ** 2 + (Character().position.y - Near_Enemy().position.y) ** 2) ** 0.5
-        if (distance < 200):
-            distance += 20
+    def distance_ai(self, other): #모션은 기존의 찌르기/베기 모션을 오버라이딩함.
+        dist()
+        if (dist() < 200):
+            dist += 20
         else:
             self.sting()
+
+    def dead(self):
+        pass
 
 class Boss(Near_Enemy, Distance_Enemy): #다중상속 -> 근/원거리 공격 포함
 
@@ -236,3 +263,15 @@ class Boss(Near_Enemy, Distance_Enemy): #다중상속 -> 근/원거리 공격 �
     def rigidity(self):
         if other.slash or other.sting:
             self.get_attack()
+
+    def boss_ai(self): #복잡해지면 근/원거리 ai로 나눌거다.
+        dist()
+        if dist() < 100:
+            self.slash #필수인 공격주기는 나중에 짜기로!
+        elif dist() > 100:
+            self.sting #원거리 공격
+        else:
+            self.stop
+
+    def dead(self):
+        pass
