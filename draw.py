@@ -2,7 +2,6 @@
 
 import pygame
 from vector import vector
-import random
 
 class image:
     def __init__(self, filename, alpha=False, pos=(0,0)):
@@ -31,13 +30,13 @@ class sprite:
         else:
             self.imagelist = [pygame.image.load(i) for i in imagenamelist]
         self.pos = vector(*pos)
-        self._picindex = 0 # 몇 번째 사진을 비출 것인지
+        self.__picindex = 0 # 몇 번째 사진을 비출 것인지
         self.update_period = update_period # 몇 프레임마다 사진을 갱신할 것인지
-        self._frame = 0 # 현재 생성 후 몇 프레임이 지났는지
-        self._len = len(self.imagelist)
+        self.__frame = 0 # 현재 생성 후 몇 프레임이 지났는지
+        self.__len = len(self.imagelist)
 
     def __len__(self):
-        return self._len
+        return self.__len
 
     def get(self):
         return self.imagelist
@@ -46,21 +45,21 @@ class sprite:
         return self.imagelist[0].get_size()
 
     def draw(self, surf):
-        surf.blit(self.imagelist[self._picindex], (self.pos.x, self.pos.y))
+        surf.blit(self.imagelist[self.__picindex], (self.pos.x, self.pos.y))
 
     def move(self, pos):
         self.pos = vector(*pos)
 
     def update(self):
-        self._frame += 1
-        if(self._frame % self.update_period == 0):
-            self._picindex = (self._picindex + 1) % len(self)
+        self.__frame += 1
+        if(self.__frame % self.update_period == 0):
+            self.__picindex = (self.__picindex + 1) % len(self)
 
 class painter:
-    def __init__(self, surf, weather=None):
+    def __init__(self, surf):
         self.surf = surf
         self.surfsize = surf.get_size()
-        self._updatelist = []
+        self.__updatelist = []
         
     def draw_bg(self, filename, alpha=False):
         bg = image(filename, alpha)
@@ -70,12 +69,12 @@ class painter:
 
     def append(self, item):
         assert 'draw' in dir(item)
-        self._updatelist.append(item)
+        self.__updatelist.append(item)
 
     def draw(self):
-        for i in self._updatelist:
+        for i in self.__updatelist:
             i.draw(self.surf)
 
     def update(self):
-        for i in self._updatelist:
+        for i in self.__updatelist:
             i.update()
