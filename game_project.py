@@ -19,6 +19,7 @@ boss class -> enemy class의 모션, 스텟, ai를 오버라이딩해서 짬. �
 '''
 from abc import *
 import random
+import pygame
 from pygame.locals import *
 import draw
 from vector import vector
@@ -45,7 +46,6 @@ GRAVITY_CONSTANT = vector(0, -8 * temp_h / (temp_t ** 2)) # gain speed (rightwar
 # human 클래스에 character, enemy가 공유함
 class Human(metaclass=ABCMeta):
 
-    @abstractmethod
     def __init__(self, hp = 100, mp = 0, atk = 0, arm = 0, cri = 0.1): #기본 스텟/몹, 캐릭터의 위치 설계
         self.hp = hp
         self.mp = mp
@@ -55,8 +55,7 @@ class Human(metaclass=ABCMeta):
 
         self.position = vector(0, 0)  #위치
         self.speed = vector(0, 0) #속도, 매 프레임마다 위치+= 속도
-        self.motion = 0  #모션
-        self.viewdir = Vright #오른쪽
+        self.viewdir = Vright #오른쪽 방향으로 일단 고정 -> 이게 없으면 방향이 고정됨 -> 고려해봐야 함
         self.onGround = True #캐릭터가 땅 위에 존재
 
     @abstractmethod 
@@ -97,6 +96,14 @@ class Human(metaclass=ABCMeta):
 
     @abstractmethod
     def dead(self): #사망
+        pass
+
+    @abstractmethod
+    def update(self): #캐릭터/몹 상태를 나타냄
+        pass
+
+    @abstractmethod
+    def draw(self): #캐릭터/몹 상태를 나타냄
         pass
 
 class Character(Human):
@@ -153,9 +160,9 @@ class Character(Human):
     	self.viewdir = Vright
 
     def walk(self): #보고 있는 방향으로 이동?
-    	if(self.viewdir == Vleft):
+    	if (self.viewdir == Vleft):
     		self.speed.x = -MOVE_SPEED
-    	elif(self.viewdir == Vright):
+    	elif (self.viewdir == Vright):
     		self.speed.x = MOVE_SPEED
     	self.sprite = self.walk_sprite
 
@@ -169,13 +176,17 @@ class Character(Human):
     def rigidity(self): #경직
         pass
 
-    def dead(self): #사망
-        pass
-
     def slash(self):
-        pass
+        self.hp - (self.arm - 'self.atk') #적의 공격력을 끌어다 쓰는것은 고려해봐야 알듯
+        if (self.cri <= random.random()):
+            self.hp - (self.arm - 'self.atk' * 2)
 
     def sting(self):
+        self.hp - (self.arm - 'self.atk')
+        if (self.cri <= random.random()):
+            self.hp - (self.arm - 'self.atk' * 2)
+
+    def dead(self): #사망
         pass
 
     def update(self):
@@ -201,23 +212,19 @@ class Near_Enemy(Human): #근거리
     def sting(self, other):
         pass
 
+
     def slash(self):
         pass
 
     def get_attack(self):
+
         pass
 
     def rigidity(self, other):
-        if other.slash() or other.sting():
-            self.get_attack()
+        pass
 
     def near_ai(self, other): #이동 메서드 추가
-        dist()
-        if (dist() < 100):
-            self.slash() or self.sting()
-        else:
-            pass
-            #dist() -= 10 #거리가 가까워짐
+        pass
 
     def dead(self):
         pass
@@ -227,20 +234,17 @@ class Distance_Enemy(Human): #원거리
     def __init__(self):
        super().__init__(hp = 250, mp = 0, atk = 20, arm = 5, cri = 0)
 
-    def sting(self): #활쏘기로 오버라이딩
-        while (self.hp == 0):
-            Character().hp - (Character().arm - Distance_Enemy().atk)
+    def sting(self ,other): #활쏘기로 오버라이딩
+        pass
+
+    def get_attack(self, other):
+        pass
 
     def rigidity(self, other):
-        if other.slash() or other.sting():
-            self.get_attack()
+        pass
 
     def distance_ai(self, other): #모션은 기존의 찌르기/베기 모션을 오버라이딩함.
-        dist()
-        if (dist() < 200):
-            dist += 20
-        else:
-            self.sting()
+        pass
 
     def dead(self):
         pass
@@ -251,27 +255,19 @@ class Boss(Near_Enemy, Distance_Enemy): #다중상속 -> 근/원거리 공격 �
         super().__init__(hp = 2000, mp = 0, atk = 25, arm = 10, cri = 0) #상속 코드 질문 다시 하기!!
 
     def slash(self, other):
-        return other.hp - (other.arm - self.atk)
+        pass
 
     def sting(self, other):
-        return other.hp -(other.arm - self.atk)
+        pass
 
     def get_attack(self, other):
-        if other.slash or other.sting:
-            return
+        pass
 
     def rigidity(self):
-        if other.slash or other.sting:
-            self.get_attack()
+        pass
 
     def boss_ai(self): #복잡해지면 근/원거리 ai로 나눌거다.
-        dist()
-        if dist() < 100:
-            self.slash #필수인 공격주기는 나중에 짜기로!
-        elif dist() > 100:
-            self.sting #원거리 공격
-        else:
-            self.stop
+        pass
 
     def dead(self):
         pass
