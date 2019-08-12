@@ -4,8 +4,13 @@ import pygame
 from vector import vector
 
 class image:
-    def __init__(self, filename, alpha=False, pos=(0,0)):
-        self.image = pygame.image.load(filename)
+    def __init__(self, file, alpha=False, pos=(0,0)):
+        if type(file) is str:
+            self.image = pygame.image.load(file)
+        elif type(file) is image:
+            self.image = file.image
+            self.alpha = file.alpha
+
         if alpha:
             self.image = self.image.convert_alpha()
         self.pos = vector(*pos)
@@ -25,10 +30,7 @@ class image:
 
 class sprite:
     def __init__(self, imagenamelist = [], alpha=False, update_period = 1, pos=(0,0)):
-        if alpha is True:
-            self.imagelist = [pygame.image.load(i).convert_alpha() for i in imagenamelist]
-        else:
-            self.imagelist = [pygame.image.load(i) for i in imagenamelist]
+        self.imagelist = [image(i, alpha, pos) for i in imagenamelist]
         self.pos = vector(*pos)
         self.__picindex = 0 # 몇 번째 사진을 비출 것인지
         self.update_period = update_period # 몇 프레임마다 사진을 갱신할 것인지
@@ -38,6 +40,9 @@ class sprite:
     def __len__(self):
         return self.__len
 
+    def __getitem__(self, index):
+        return imagelist[index]
+
     def get(self):
         return self.imagelist
 
@@ -45,7 +50,7 @@ class sprite:
         return self.imagelist[0].get_size()
 
     def draw(self, surf):
-        surf.blit(self.imagelist[self.__picindex], (self.pos.x, self.pos.y))
+        surf.blit(self.imagelist[self.__picindex].get(), (self.pos.x, self.pos.y))
 
     def move(self, pos):
         self.pos = vector(*pos)
