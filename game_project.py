@@ -32,10 +32,15 @@ Jump = 'jump'
 Vleft = 'view_left'
 Vright = 'view_right'
 
+MOVE_SPEED = 3
 GROUND_HEIGHT = 350
-GRAVITY_CONSTANT = vector(0, 4.0) # gain speed (rightward , downward) px per frame
-MOVE_SPEED = 6
-JUMP_SPEED = -40
+
+temp_t = 120
+temp_h = -150
+
+
+JUMP_SPEED = 4 * temp_h / temp_t
+GRAVITY_CONSTANT = vector(0, -8 * temp_h / (temp_t ** 2)) # gain speed (rightward , downward) px per frame
 
 # human 클래스에 character, enemy가 공유함
 class Human(metaclass=ABCMeta):
@@ -95,14 +100,18 @@ class Human(metaclass=ABCMeta):
         pass
 
 class Character(Human):
+    def __init__(self, hp = 100, mp = 0, atk = 0, arm = 0, cri = 0.1): #기본 스텟/몹, 캐릭터의 위치 설계
+        super().__init__(hp = 100, mp = 0, atk = 0, arm = 0, cri = 0.1)
+        self.position = vector(60, GROUND_HEIGHT)
+        self.speed = vector(0, 0) #속도. 매 프레임마다 위치+= 속도
 
-    def __init__(self):
-        super().__init__(hp = 100, mp = 0, atk = 30, arm = 10, cri = 0.1) #상속
+        self.motion = 0  #모션
+        self.viewdir = Vright #오른쪽
+        self.onGround = True #캐릭터가 땅 위에 존재
 
         self.sprite = None
-        self.position = vector(60, GROUND_HEIGHT)
         self.static_sprite = draw.sprite(['image/char/static.png'], True, 2, self.position)
-        self.walk_sprite = draw.sprite(['image/char/walk-' + str(i) + '.png' for i in range(1,4)],True, 12, self.position)
+        self.walk_sprite = draw.sprite(['image/char/walk-' + str(i) + '.png' for i in range(1,4)], True, 12, self.position)
 
         self.stop()
         
@@ -153,12 +162,6 @@ class Character(Human):
     def stop(self):
         self.speed.x = 0
         self.sprite = self.static_sprite
-    
-    def rigidity(self):
-    	pass
-
-    def dead(self):
-    	pass
 
     def get_attack(self): #피격 판정
         pass
@@ -176,9 +179,10 @@ class Character(Human):
         pass
 
     def update(self):
+        self.position += self.speed
         self.sprite.move(self.position)
         self.sprite.update()
-        self.position += self.speed
+
         if not self.onGround:
             self.speed += GRAVITY_CONSTANT
         if(self.position.y > GROUND_HEIGHT):
@@ -192,17 +196,16 @@ class Character(Human):
 class Near_Enemy(Human): #근거리
 
     def __init__(self):
-        Human.__init__(hp = 800, mp = 0, atk = 15, arm = 10, cri = 0)
+        super().__init__(hp = 800, mp = 0, atk = 15, arm = 10, cri = 0)
 
     def sting(self, other):
-        return other.hp - (other.arm - self.atk)
+        pass
 
-    def slash(self, other):
-        return other.hp - (other.arm - self.atk)
+    def slash(self):
+        pass
 
-    def get_attack(self, other):
-        if other.slash() or other.sting():
-            return #피격 상태 이미지로 출력 -> 추후에 경직 시간(후딜레이) 고려해야 함!
+    def get_attack(self):
+        pass
 
     def rigidity(self, other):
         if other.slash() or other.sting():
@@ -222,14 +225,11 @@ class Near_Enemy(Human): #근거리
 class Distance_Enemy(Human): #원거리
 
     def __init__(self):
-       Human.__init__(hp = 250, mp = 0, atk = 20, arm = 5, cri = 0)
-    
-    def sting(self ,other): #활쏘기로 오버라이딩
-        return other.hp - (other.arm - self.atk)
+       super().__init__(hp = 250, mp = 0, atk = 20, arm = 5, cri = 0)
 
-    def get_attack(self, other):
-        if other.slash() or other.sting():
-            return #피격 상태 이미지 출력 -> 추후에 경직 시간(후딜레이)도 고려해야 함
+    def sting(self): #활쏘기로 오버라이딩
+        while (self.hp == 0):
+            Character().hp - (Character().arm - Distance_Enemy().atk)
 
     def rigidity(self, other):
         if other.slash() or other.sting():
@@ -248,7 +248,7 @@ class Distance_Enemy(Human): #원거리
 class Boss(Near_Enemy, Distance_Enemy): #다중상속 -> 근/원거리 공격 포함
 
     def __init__(self):
-        Human.__init__(hp = 2000, mp = 0, atk = 25, arm = 10, cri = 0) #상속 코드 질문 다시 하기!!
+        super().__init__(hp = 2000, mp = 0, atk = 25, arm = 10, cri = 0) #상속 코드 질문 다시 하기!!
 
     def slash(self, other):
         return other.hp - (other.arm - self.atk)
