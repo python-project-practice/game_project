@@ -2,7 +2,7 @@
 
 class hitbox(pygame.Rect):
     def __init__(self, parent, x, y, width, height):
-        super().__init__(self, x, y, width, height)
+        super().__init__(x, y, width, height)
         self.parent = parent
 
     def get_attack(self, other):

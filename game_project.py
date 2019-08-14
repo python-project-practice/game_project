@@ -34,12 +34,12 @@ Jump = 'jump'
 Vleft = 'view_left'
 Vright = 'view_right'
 
-MOVE_SPEED = 3
+MOVE_SPEED = 6
 GROUND_HEIGHT = 350
 MAP_LEFT_LIMIT = 0
 MAP_RIGHT_LIMIT = 800
 
-temp_t = 120
+temp_t = 60
 temp_h = -150
 
 
@@ -104,7 +104,11 @@ class Human(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def update(self): #캐릭터/몹 상태를 나타냄
+    def update(self): #캐릭터 상태 업데이트: 캐릭터의 스텟이나 위치 등 상태만 업데이트 한다. 내부에서 이미지 업데이트를 부르지 말자.
+        pass
+
+    @abstractmethod
+    def image_update(self): # 캐릭터 이미지 업데이트: 스프라이트 이미지만 업데이트 한다. 내부에서 상태 업데이트를 부르지 말자.
         pass
 
     @abstractmethod
@@ -121,8 +125,8 @@ class Character(Human):
         self.viewdir = Vright #오른쪽
         self.onGround = True #캐릭터가 땅 위에 존재
 
-        self.static_sprite = draw.sprite(['image/char/static.png'], True, 2, self.position)
-        self.walk_sprite = draw.sprite(['image/char/walk-' + str(i) + '.png' for i in range(1,4)], True, 12, self.position)
+        self.static_sprite = draw.sprite(['image/char/static.png'], True, 1, self.position)
+        self.walk_sprite = draw.sprite(['image/char/walk-' + str(i) + '.png' for i in range(1,4)], True, 6, self.position)
 
         self.sprite = self.static_sprite
 
@@ -196,14 +200,16 @@ class Character(Human):
     def dead(self): #사망
         pass
 
+    def image_update(self):
+        self.sprite.move(self.position)
+        self.sprite.image_update()
+
     def update(self):
         self.position += self.speed
-        if(self.position.x < MAP_LEFT_LIMIT): #self.position
+        if(self.position.x < MAP_LEFT_LIMIT): #self.position.left < MAP_LEFT_LIMIT
             self.position.x = MAP_LEFT_LIMIT
         if(self.position.x + self.sprite.get_size()[0] > MAP_RIGHT_LIMIT):
             self.position.x = MAP_RIGHT_LIMIT - self.sprite.get_size()[0]
-        self.sprite.move(self.position)
-        self.sprite.update()
 
         if not self.onGround:
             self.speed += GRAVITY_CONSTANT
