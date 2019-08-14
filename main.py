@@ -65,6 +65,7 @@ while True:
     enemy_1.near_ai(player)
     player.control(pygame.key.get_pressed())
     player.update()
+    enemy_1.update()
     painter.image_update()
 
     painter.draw_bg('image/MapSunny.png')

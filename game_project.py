@@ -180,14 +180,14 @@ class Character(Human):
         pass
 
     def slash(self):
-        self.hp - (self.arm - 'self.atk') #적의 공격력을 끌어다 쓰는것은 고려해봐야 할듯
+        self.hp - (self.arm - self.atk) #적의 공격력을 끌어다 쓰는것은 고려해봐야 할듯
         if (self.cri <= random.random()):
-            self.hp - (self.arm - 'self.atk' * 2)
+            self.hp - (self.arm - self.atk * 2)
 
     def sting(self):
-        self.hp - (self.arm - 'self.atk')
+        self.hp - (self.arm - self.atk)
         if (self.cri <= random.random()):
-            self.hp - (self.arm - 'self.atk' * 2)
+            self.hp - (self.arm - self.atk * 2)
 
     def dead(self): #사망
         pass
@@ -286,10 +286,12 @@ class Near_Enemy(Human): #근거리
     def dead(self):
         pass
 
+    def image_update(self):
+        self.sprite.move(self.position)
+        self.sprite.image_update()
+
     def update(self):
         self.position += self.speed
-        self.sprite.move(self.position)
-        self.sprite.update()
 
         if not self.onGround:
             self.speed += GRAVITY_CONSTANT
