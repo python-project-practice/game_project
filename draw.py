@@ -4,7 +4,7 @@ import pygame
 from vector import vector
 
 class image:
-    def __init__(self, file, alpha=False, pos=(0,0)):
+    def __init__(self, file, alpha=False, pos=(0,0)): #alpha = 투명도
         if type(file) is str:
             self.image = pygame.image.load(file)
         elif type(file) is image:
