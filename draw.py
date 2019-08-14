@@ -28,6 +28,10 @@ class image:
     def draw(self, surf):
         surf.blit(self.image, (self.pos.x, self.pos.y))
 
+    def image_update(self):
+        # do absolutely nothing
+        pass
+
 class sprite:
     def __init__(self, imagenamelist = [], alpha=False, update_period = 1, pos=(0,0)):
         self.imagelist = [image(i, alpha, pos) for i in imagenamelist]
@@ -55,7 +59,7 @@ class sprite:
     def move(self, pos):
         self.pos = vector(*pos)
 
-    def update(self):
+    def image_update(self):
         self.__frame += 1
         if(self.__frame % self.update_period == 0):
             self.__picindex = (self.__picindex + 1) % len(self)
@@ -80,6 +84,6 @@ class painter:
         for i in self.__updatelist:
             i.draw(self.surf)
 
-    def update(self):
+    def image_update(self):
         for i in self.__updatelist:
-            i.update()
+            i.image_update()
