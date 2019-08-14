@@ -22,6 +22,7 @@ import random
 import pygame
 from pygame.locals import *
 import draw
+from collision import hitbox
 from vector import vector
 
 #++ 히트박스 클래스 고려하여 프로그래밍 ㄱㄱ
@@ -35,6 +36,8 @@ Vright = 'view_right'
 
 MOVE_SPEED = 3
 GROUND_HEIGHT = 350
+MAP_LEFT_LIMIT = 0
+MAP_RIGHT_LIMIT = 800
 
 temp_t = 120
 temp_h = -150
@@ -56,6 +59,8 @@ class Human(metaclass=ABCMeta):
         self.position = vector(0, 0)  #위치
         self.speed = vector(0, 0) #속도, 매 프레임마다 위치+= 속도
         self.viewdir = Vright #오른쪽 방향으로 일단 고정 -> 이게 없으면 방향이 고정됨 -> 고려해봐야 함
+        # self.act = 'stop' #여러 프레임이 걸리는 행동이 있을 거 아냐 그럴 때 지금 무슨 행동을 실행하고 있는지
+        # self.actframe = 0 # 여러 프레임이 걸리는 행동일 경우 지금 몇 프레임째 실행하고 있는지
         self.onGround = True #캐릭터가 땅 위에 존재
 
     @abstractmethod 
@@ -108,7 +113,7 @@ class Human(metaclass=ABCMeta):
 
 class Character(Human):
     def __init__(self, hp = 100, mp = 0, atk = 0, arm = 0, cri = 0.1): #기본 스텟/몹, 캐릭터의 위치 설계
-        super().__init__(hp = 100, mp = 0, atk = 0, arm = 0, cri = 0.1)
+        super().__init__(hp, mp, atk, arm, cri)
         self.position = vector(60, GROUND_HEIGHT)
         self.speed = vector(0, 0) #속도. 매 프레임마다 위치+= 속도
 
@@ -116,10 +121,12 @@ class Character(Human):
         self.viewdir = Vright #오른쪽
         self.onGround = True #캐릭터가 땅 위에 존재
 
-        self.sprite = None
         self.static_sprite = draw.sprite(['image/char/static.png'], True, 2, self.position)
         self.walk_sprite = draw.sprite(['image/char/walk-' + str(i) + '.png' for i in range(1,4)], True, 12, self.position)
 
+        self.sprite = self.static_sprite
+
+        self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size())
         self.stop()
         
     def control(self, keys): #기본적인 조작법
@@ -191,6 +198,10 @@ class Character(Human):
 
     def update(self):
         self.position += self.speed
+        if(self.position.x < MAP_LEFT_LIMIT): #self.position
+            self.position.x = MAP_LEFT_LIMIT
+        if(self.position.x + self.sprite.get_size()[0] > MAP_RIGHT_LIMIT):
+            self.position.x = MAP_RIGHT_LIMIT - self.sprite.get_size()[0]
         self.sprite.move(self.position)
         self.sprite.update()
 
