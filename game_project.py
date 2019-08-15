@@ -117,10 +117,12 @@ class Character(Human):
         self.viewdir = Vright #오른쪽
         self.onGround = True #캐릭터가 땅 위에 존재
 
-        self.static_sprite = draw.sprite(['image/char/static.png'], True, 1, self.position)
-        self.walk_sprite = draw.sprite(['image/char/walk-' + str(i) + '.png' for i in range(1,4)], True, 6, self.position)
+        self.static_right_sprite = draw.sprite(['image/char/static.png'], True, 1, self.position)
+        self.static_left_sprite = self.static_right_sprite.flip(True, False)
+        self.walk_right_sprite = draw.sprite(['image/char/walk-' + str(i) + '.png' for i in range(1,4)], True, 6, self.position)
+        self.walk_left_sprite = self.walk_right_sprite.flip(True, False)
 
-        self.sprite = self.static_sprite
+        self.sprite = self.static_right_sprite
 
         self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size())
         self.stop()
@@ -154,24 +156,32 @@ class Character(Human):
         if self.onGround:
             self.onGround = False
             self.speed.y = JUMP_SPEED
-            self.sprite = self.static_sprite
+            if self.viewdir == Vright:
+                self.sprite = self.static_right_sprite
+            if self.viewdir == Vleft:
+                self.sprite = self.static_left_sprite
 
     def left(self): #좌측 보기?
-    	self.viewdir = Vleft
+        self.viewdir = Vleft
 
     def right(self): #우측 보기?
-    	self.viewdir = Vright
+        self.viewdir = Vright
 
     def walk(self): #보고 있는 방향으로 이동?
-    	if (self.viewdir == Vleft):
-    		self.speed.x = -MOVE_SPEED
-    	elif (self.viewdir == Vright):
-    		self.speed.x = MOVE_SPEED
-    	self.sprite = self.walk_sprite
+        if (self.viewdir == Vleft):
+            self.speed.x = -MOVE_SPEED
+            self.sprite = self.walk_left_sprite
+
+        elif (self.viewdir == Vright):
+            self.speed.x = MOVE_SPEED
+            self.sprite = self.walk_right_sprite
 
     def stop(self):
         self.speed.x = 0
-        self.sprite = self.static_sprite
+        if self.viewdir == Vright:
+            self.sprite = self.static_right_sprite
+        if self.viewdir == Vleft:
+            self.sprite = self.static_left_sprite
 
     def get_attack(self): #피격 판정
         pass
@@ -239,17 +249,17 @@ class Near_Enemy(Human): #근거리
             self.sprite = self.static_sprite
 
     def left(self): #좌측 보기?
-    	self.viewdir = Vleft
+        self.viewdir = Vleft
 
     def right(self): #우측 보기?
-    	self.viewdir = Vright
+        self.viewdir = Vright
 
     def walk(self): #보고 있는 방향으로 이동?
-    	if (self.viewdir == Vleft):
-    		self.speed.x = -MOVE_SPEED
-    	elif (self.viewdir == Vright):
-    		self.speed.x = MOVE_SPEED
-    	self.sprite = self.walk_sprite
+        if (self.viewdir == Vleft):
+            self.speed.x = -MOVE_SPEED
+        elif (self.viewdir == Vright):
+            self.speed.x = MOVE_SPEED
+        self.sprite = self.walk_sprite
 
     def stop(self):
         self.speed.x = 0
