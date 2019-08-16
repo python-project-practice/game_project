@@ -20,6 +20,7 @@ pygame.init()
 DISP = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("연습")
 painter = draw.painter(DISP)
+painter.append_bg('image/MapSunny.png')
 player = Character()
 
 
@@ -42,6 +43,7 @@ RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 
 frame = 0
+frame_hp = 0
 clock = pygame.time.Clock()
 while True:
     clock.tick(60)
@@ -57,13 +59,14 @@ while True:
     player.update()
     enemy_1.update()
     painter.image_update()
+    painter.draw()
 
     painter.draw_bg('image/MapSunny.png')
     pygame.draw.rect(DISP, WHITE, [0, 0, 400, 75])
     if frame < 150: 
         pygame.draw.rect(DISP, RED, [5, 5, 150 - frame, 30])
     pygame.draw.rect(DISP, BLUE, [5, 40, 150, 30])    
-    painter.draw()
+
 
 
     pygame.display.update()
