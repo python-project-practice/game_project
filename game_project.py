@@ -117,9 +117,10 @@ class Character(Human):
         self.viewdir = Vright #오른쪽
         self.onGround = True #캐릭터가 땅 위에 존재
 
-        self.static_sprite = draw.sprite(['image/char/static.png'], True, 1, self.position)
-        self.walk_sprite = draw.sprite(['image/char/walk-' + str(i) + '.png' for i in range(1,4)], True, 6, self.position)
-
+        self.static_right_sprite = draw.sprite(['image/char/static.png'], True, 1, self.position)
+        self.static_left_sprite = self.static_right_sprite.flip(True, False)
+        self.walk_right_sprite = draw.sprite(['image/char/walk-' + str(i) + '.png' for i in range(1,4)], True, 6, self.position)
+        self.walk_left_sprite = self.walk_right_sprite.flip(True, False)
         self.slash_sprite = draw.sprite(['image/char/slash_' + str(i) + '.png' for i in range(1,2)], True, 2, self.position)
 
         self.sprite = self.static_sprite
@@ -138,7 +139,7 @@ class Character(Human):
             self.walk()
 
         else:
-            self.slash()
+            self.stop()
 
 
         if keys[K_UP] and self.onGround:
@@ -157,7 +158,10 @@ class Character(Human):
         if self.onGround:
             self.onGround = False
             self.speed.y = JUMP_SPEED
-            self.sprite = self.static_sprite
+            if self.viewdir == Vright:
+                self.sprite = self.static_right_sprite
+            if self.viewdir == Vleft:
+                self.sprite = self.static_left_sprite
 
     def left(self): #좌측 보기?
     	self.viewdir = Vleft
@@ -168,14 +172,17 @@ class Character(Human):
     def walk(self): #보고 있는 방향으로 이동?
     	if (self.viewdir == Vleft):
     		self.speed.x = -MOVE_SPEED
+            self.sprite = self.walk_left_sprite
     	elif (self.viewdir == Vright):
     		self.speed.x = MOVE_SPEED
-    	self.sprite = self.walk_sprite
+    	    self.sprite = self.walk_right_sprite
 
     def stop(self):
         self.speed.x = 0
-        self.sprite = self.static_sprite
-
+        if self.viewdir == Vright:
+            self.sprite = self.static_right_sprite
+        if self.viewdir == Vleft:
+            self.sprite = self.static_left_sprite
     def get_attack(self): #피격 판정
         pass
 
@@ -190,7 +197,7 @@ class Character(Human):
                 self.hp - (self.arm - self.atk * 2)
         else:
             self.stop()
-
+        
     def sting(self):
         self.hp - (self.arm - self.atk)
         if (self.cri <= random.random()):
@@ -293,10 +300,12 @@ class Near_Enemy(Human): #근거리
     def dead(self):
         pass
 
+    def image_update(self):
+        self.sprite.move(self.position)
+        self.sprite.image_update()
+
     def update(self):
         self.position += self.speed
-        self.sprite.move(self.position)
-        self.sprite.update()
 
         if not self.onGround:
             self.speed += GRAVITY_CONSTANT

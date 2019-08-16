@@ -66,6 +66,7 @@ while True:
 
     player.control(pygame.key.get_pressed())
     player.update()
+    enemy_1.update()
     painter.image_update()
 
     painter.draw_bg('image/MapSunny.png')

@@ -3,16 +3,20 @@
 import pygame
 from vector import vector
 
-class image:
+class image():
     def __init__(self, file, alpha=False, pos=(0,0)): #alpha = 투명도
         if type(file) is str:
             self.image = pygame.image.load(file)
+            if alpha:
+                self.image = self.image.convert_alpha()
+                self.alpha = True
         elif type(file) is image:
             self.image = file.image
             self.alpha = file.alpha
+        elif type(file) is pygame.Surface:
+            self.image = file
+            self.alpha = alpha
 
-        if alpha:
-            self.image = self.image.convert_alpha()
         self.pos = vector(*pos)
 
     def get(self):
@@ -20,6 +24,11 @@ class image:
 
     def get_size(self):
         return self.image.get_size()
+
+    def flip(self, xbool, ybool):
+        retimg = image(self)
+        retimg.image = pygame.transform.flip(self.image, xbool, ybool)
+        return retimg
 
     def move(self, pos):
         # assert pos[0] > 0 and pos[1] > 0
@@ -45,13 +54,16 @@ class sprite:
         return self.__len
 
     def __getitem__(self, index):
-        return imagelist[index]
+        return self.imagelist[index]
 
     def get(self):
         return self.imagelist
 
     def get_size(self):
         return self.imagelist[0].get_size()
+
+    def flip(self, xbool, ybool):
+        return sprite([i.flip(xbool, ybool) for i in self], update_period=self.update_period, pos=self.pos)
 
     def draw(self, surf):
         surf.blit(self.imagelist[self.__picindex].get(), (self.pos.x, self.pos.y))
