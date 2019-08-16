@@ -31,7 +31,7 @@ class image():
         retimg.image = pygame.transform.scale(self.image, (x, y))
         return retimg
 
-    def flip(self, xbool, ybool):
+    def flip(self, xbool, ybool): #바꾼 이미지를 변환
         retimg = image(self)
         retimg.image = pygame.transform.flip(self.image, xbool, ybool)
         return retimg
