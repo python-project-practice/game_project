@@ -121,7 +121,7 @@ class Character(Human):
         self.static_left_sprite = self.static_right_sprite.flip(True, False)
         self.walk_right_sprite = draw.sprite(['image/char/walk-' + str(i) + '.png' for i in range(1,5)], True, 6, self.position)
         self.walk_left_sprite = self.walk_right_sprite.flip(True, False)
-        self.slash_sprite = draw.sprite(['image/char/slash_' + str(i) + '.png' for i in range(1,3)], True, 4, self.position)
+        self.slash_sprite = draw.sprite(['image/char/slash_' + str(i) + '.png' for i in range(1,3)], True, 1, self.position)
 
         self.sprite = self.static_right_sprite
 

@@ -7,6 +7,7 @@ class image():
     def __init__(self, file, alpha=False, pos=(0,0)): #alpha = 투명도
         if type(file) is str:
             self.image = pygame.image.load(file)
+            self.alpha = False
             if alpha:
                 self.image = self.image.convert_alpha()
                 self.alpha = True
@@ -24,6 +25,11 @@ class image():
 
     def get_size(self):
         return self.image.get_size()
+
+    def set_size(self, x, y):
+        retimg = image(self)
+        retimg.image = pygame.transform.scale(self.image, (x, y))
+        return retimg
 
     def flip(self, xbool, ybool):
         retimg = image(self)
@@ -80,13 +86,14 @@ class painter:
     def __init__(self, surf):
         self.surf = surf
         self.surfsize = surf.get_size()
+        self.bg = None
         self.__updatelist = []
         
-    def draw_bg(self, filename, alpha=False):
-        bg = image(filename, alpha)
+    def append_bg(self, item, alpha=False):
+        bg = image(item, alpha)
         bgsize = bg.get_size()
-        bg = pygame.transform.scale(bg.get(), (bgsize[0] * self.surfsize[1] // bgsize[1], self.surfsize[1]))
-        self.surf.blit(bg, (0,0))
+        bg = bg.set_size(bgsize[0] * self.surfsize[1] // bgsize[1], self.surfsize[1])
+        self.__updatelist.append(bg)
 
     def append(self, item):
         assert 'draw' in dir(item)

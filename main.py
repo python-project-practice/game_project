@@ -30,6 +30,7 @@ pygame.init()
 DISP = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("연습")
 painter = draw.painter(DISP)
+painter.append_bg('image/MapSunny.png')
 player = Character()
 
 
@@ -68,12 +69,11 @@ while True:
     player.update()
     enemy_1.update()
     painter.image_update()
+    painter.draw()
 
-    painter.draw_bg('image/MapSunny.png')
     pygame.draw.rect(DISP, WHITE, [0, 0, 400, 75]) 
     pygame.draw.rect(DISP, RED, [5, 5, 150, 30])
     pygame.draw.rect(DISP, BLUE, [5, 40, 150, 30])    
-    painter.draw()
 
 
     pygame.display.update()
