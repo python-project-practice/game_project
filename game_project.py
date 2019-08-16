@@ -119,15 +119,14 @@ class Character(Human):
 
         self.static_right_sprite = draw.sprite(['image/char/static.png'], True, 1, self.position)
         self.static_left_sprite = self.static_right_sprite.flip(True, False)
-        self.walk_right_sprite = draw.sprite(['image/char/walk-' + str(i) + '.png' for i in range(1,4)], True, 6, self.position)
+        self.walk_right_sprite = draw.sprite(['image/char/walk-' + str(i) + '.png' for i in range(1,5)], True, 6, self.position)
         self.walk_left_sprite = self.walk_right_sprite.flip(True, False)
-        self.slash_sprite = draw.sprite(['image/char/slash_' + str(i) + '.png' for i in range(1,2)], True, 2, self.position)
+        self.slash_sprite = draw.sprite(['image/char/slash_' + str(i) + '.png' for i in range(1,3)], True, 4, self.position)
 
         self.sprite = self.static_right_sprite
-        self.sprite = self.slash_sprite #??
 
         self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size())
-        self.stop()
+        self.stop()  #stop 상태로 초기화
         
     def control(self, keys): #기본적인 조작법
         if keys[K_RIGHT]:
@@ -190,13 +189,10 @@ class Character(Human):
         pass
 
     def slash(self):
-        if self.stop():
-            self.sprite = self.slash_sprite
-            self.hp - (self.arm - self.atk) #적의 공격력을 끌어다 쓰는것은 고려해봐야 할듯
-            if (self.cri <= random.random()):
-                self.hp - (self.arm - self.atk * 2)
-        else:
-            self.stop()
+        self.sprite = self.slash_sprite
+        self.hp - (self.arm - self.atk) #적의 공격력을 끌어다 쓰는것은 고려해봐야 할듯
+        if (self.cri <= random.random()):
+            self.hp - (self.arm - self.atk * 2)
         
     def sting(self):
         self.hp - (self.arm - self.atk)
