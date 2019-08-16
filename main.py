@@ -13,16 +13,6 @@ from collision import collide_list_to_list
 y는 아래 방향이 크게, x는 오른 쪽이 크게.
 원점은 가장 왼쪽 위.
 
-
-
-
-
-
-
-
-
-
-
 '''
 WIDTH, HEIGHT = 800, 600
 
@@ -53,6 +43,7 @@ RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 
 frame = 0
+frame_hp = 0
 clock = pygame.time.Clock()
 while True:
     clock.tick(60)
@@ -60,10 +51,8 @@ while True:
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
-
             sys.exit()
    
-
 
     enemy_1.near_ai(player)
     player.control(pygame.key.get_pressed())
@@ -72,9 +61,12 @@ while True:
     painter.image_update()
     painter.draw()
 
-    pygame.draw.rect(DISP, WHITE, [0, 0, 400, 75]) 
-    pygame.draw.rect(DISP, RED, [5, 5, 150, 30])
+    painter.draw_bg('image/MapSunny.png')
+    pygame.draw.rect(DISP, WHITE, [0, 0, 400, 75])
+    if frame < 150: 
+        pygame.draw.rect(DISP, RED, [5, 5, 150 - frame, 30])
     pygame.draw.rect(DISP, BLUE, [5, 40, 150, 30])    
+
 
 
     pygame.display.update()

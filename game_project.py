@@ -243,7 +243,7 @@ class Near_Enemy(Human): #근거리
         self.onGround = True #캐릭터가 땅 위에 존재
 
         self.static_right_sprite = draw.sprite(['image/char/static.png'], True, 1, self.position)
-        self.static_left_sprite = self.static_right_sprite.flip(True, False)
+        self.static_left_sprite = self.static_right_sprite.flip(True, False) #좌우 대칭
         self.walk_right_sprite = draw.sprite(['image/char/walk-' + str(i) + '.png' for i in range(1,5)], True, 6, self.position)
         self.walk_left_sprite = self.walk_right_sprite.flip(True, False)
         self.slash_right_sprite = draw.sprite(['image/char/slash_' + str(i) + '.png' for i in range(1,3)], False, 2, self.position)
