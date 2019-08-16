@@ -7,6 +7,7 @@ class image():
     def __init__(self, file, alpha=False, pos=(0,0)): #alpha = 투명도
         if type(file) is str:
             self.image = pygame.image.load(file)
+            self.alpha = False
             if alpha:
                 self.image = self.image.convert_alpha()
                 self.alpha = True
@@ -25,7 +26,7 @@ class image():
     def get_size(self):
         return self.image.get_size()
 
-    def flip(self, xbool, ybool):
+    def flip(self, xbool, ybool): #바꾼 이미지를 변환
         retimg = image(self)
         retimg.image = pygame.transform.flip(self.image, xbool, ybool)
         return retimg
