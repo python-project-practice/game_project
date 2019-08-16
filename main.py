@@ -41,10 +41,14 @@ painter.append(enemy_1)
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
+BLACK = (0, 0, 0)
 
 frame = 0
 frame_hp = 0
 clock = pygame.time.Clock()
+
+gulim = pygame.font.SysFont('Gulim', 36)
+
 while True:
     clock.tick(60)
 
@@ -61,13 +65,14 @@ while True:
     painter.image_update()
     painter.draw()
 
-    painter.draw_bg('image/MapSunny.png')
     pygame.draw.rect(DISP, WHITE, [0, 0, 400, 75])
     if frame < 150: 
         pygame.draw.rect(DISP, RED, [5, 5, 150 - frame, 30])
     pygame.draw.rect(DISP, BLUE, [5, 40, 150, 30])    
-
-
+    
+    fps = clock.get_fps()
+    fpsmsg = gulim.render('fps: ' + str(int(fps)), 1, BLACK, WHITE)
+    DISP.blit(fpsmsg, (650, 10))
 
     pygame.display.update()
 
