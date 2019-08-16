@@ -123,7 +123,7 @@ class Character(Human):
         self.walk_left_sprite = self.walk_right_sprite.flip(True, False)
         self.slash_sprite = draw.sprite(['image/char/slash_' + str(i) + '.png' for i in range(1,2)], True, 2, self.position)
 
-        self.sprite = self.static_sprite
+        self.sprite = self.static_right_sprite
         self.sprite = self.slash_sprite #??
 
         self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size())
@@ -164,18 +164,18 @@ class Character(Human):
                 self.sprite = self.static_left_sprite
 
     def left(self): #좌측 보기?
-    	self.viewdir = Vleft
+        self.viewdir = Vleft
 
     def right(self): #우측 보기?
-    	self.viewdir = Vright
+        self.viewdir = Vright
 
     def walk(self): #보고 있는 방향으로 이동?
-    	if (self.viewdir == Vleft):
-    		self.speed.x = -MOVE_SPEED
+        if (self.viewdir == Vleft):
+            self.speed.x = -MOVE_SPEED
             self.sprite = self.walk_left_sprite
-    	elif (self.viewdir == Vright):
-    		self.speed.x = MOVE_SPEED
-    	    self.sprite = self.walk_right_sprite
+        elif (self.viewdir == Vright):
+            self.speed.x = MOVE_SPEED
+            self.sprite = self.walk_right_sprite
 
     def stop(self):
         self.speed.x = 0
@@ -253,17 +253,17 @@ class Near_Enemy(Human): #근거리
             self.sprite = self.static_sprite
 
     def left(self): #좌측 보기?
-    	self.viewdir = Vleft
+        self.viewdir = Vleft
 
     def right(self): #우측 보기?
-    	self.viewdir = Vright
+        self.viewdir = Vright
 
     def walk(self): #보고 있는 방향으로 이동?
-    	if (self.viewdir == Vleft):
-    		self.speed.x = -MOVE_SPEED
-    	elif (self.viewdir == Vright):
-    		self.speed.x = MOVE_SPEED
-    	self.sprite = self.walk_sprite
+        if (self.viewdir == Vleft):
+            self.speed.x = -MOVE_SPEED
+        elif (self.viewdir == Vright):
+            self.speed.x = MOVE_SPEED
+        self.sprite = self.walk_sprite
 
     def stop(self):
         self.speed.x = 0
