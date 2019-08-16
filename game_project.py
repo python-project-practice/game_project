@@ -141,6 +141,8 @@ class Character(Human):
 
         else:
             self.stop()
+            if keys[K_z]:
+                self.slash()
 
 
         if keys[K_UP] and self.onGround:
@@ -149,8 +151,6 @@ class Character(Human):
         if keys[K_x]:
             self.sting()
         
-        elif keys[K_z]:
-            self.slash()
         
         else:
             pass
@@ -172,10 +172,10 @@ class Character(Human):
 
     def walk(self): #보고 있는 방향으로 이동?
         if (self.viewdir == Vleft):
-            self.speed.x = -MOVE_SPEED
+            self.position.x -= MOVE_SPEED
             self.sprite = self.walk_left_sprite
         elif (self.viewdir == Vright):
-            self.speed.x = MOVE_SPEED
+            self.position.x += MOVE_SPEED
             self.sprite = self.walk_right_sprite
 
     def stop(self):
@@ -272,10 +272,10 @@ class Near_Enemy(Human): #근거리
 
     def walk(self): #보고 있는 방향으로 이동?
         if (self.viewdir == Vleft):
-            self.speed.x = -MOVE_SPEED
+            self.position.x -= MOVE_SPEED
             self.sprite = self.walk_left_sprite
         elif (self.viewdir == Vright):
-            self.speed.x = MOVE_SPEED
+            self.position.x += MOVE_SPEED
             self.sprite = self.walk_right_sprite
 
     def stop(self):
@@ -293,6 +293,7 @@ class Near_Enemy(Human): #근거리
             else:
                 self.slash()
         elif -100 < dist < 100:
+            self.stop()
             self.sting()
         elif dist > 100:
             self.left()
@@ -302,7 +303,7 @@ class Near_Enemy(Human): #근거리
             self.walk()
 
     def sting(self):
-        self.stop()
+        pass
 
     def slash(self):
         if (self.viewdir == Vleft):
