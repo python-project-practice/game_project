@@ -43,10 +43,10 @@ player = Character()
 # 벽도 히트박스를 만들까 싶긴 한데, 굳이 지금은 할 필요가 있을까 싶네. 좌우 화면 벗어나는건 각각의 .update()에서 담당하게 했다.
 # 이걸 바꿀 필요가 있을까? 이것도 hitbox로 처리하는게 나을까?
 painter.append(player)
-
+'''
 enemy_1 = Near_Enemy()
 painter.append(enemy_1)
-
+'''
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
@@ -62,7 +62,8 @@ while True:
             sys.exit()
    
 
-    enemy_1.near_ai(player)
+
+
     player.control(pygame.key.get_pressed())
     player.update()
     painter.image_update()
@@ -72,6 +73,7 @@ while True:
     pygame.draw.rect(DISP, RED, [5, 5, 150, 30])
     pygame.draw.rect(DISP, BLUE, [5, 40, 150, 30])    
     painter.draw()
+
 
     pygame.display.update()
 
