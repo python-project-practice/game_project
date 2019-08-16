@@ -123,9 +123,12 @@ class Character(Human):
         self.walk_left_sprite = self.walk_right_sprite.flip(True, False)
         self.slash_right_sprite = draw.sprite(['image/char/slash_' + str(i) + '.png' for i in range(1,3)], False, 3, self.position)
         self.slash_left_sprite = self.slash_right_sprite.flip(True, False)
+        self.sting_right_sprite = draw.sprite(['image/char/sting_' + str(i) + '.png' for i in range(1,3)], True, 2, self.position)
+        self.sting_left_sprite = self.sting_right_sprite.flip(True, False)
 
         self.sprite = self.static_right_sprite
         self.sprite = self.slash_right_sprite
+        self.sprite = self.sting_right_sprite
 
         self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size())
         self.stop() #stop 상태로 초기화
@@ -201,6 +204,10 @@ class Character(Human):
             self.hp - (self.arm - self.atk * 2)
         
     def sting(self):
+        if (self.viewdir == Vleft):
+            self.sprite = self.sting_left_sprite
+        elif (self.viewdir == Vright):
+            self.sprite = self.sting_right_sprite
         self.hp - (self.arm - self.atk)
         if (self.cri <= random.random()):
             self.hp - (self.arm - self.atk * 2)
@@ -246,11 +253,14 @@ class Near_Enemy(Human): #근거리
         self.static_left_sprite = self.static_right_sprite.flip(True, False) #좌우 대칭
         self.walk_right_sprite = draw.sprite(['image/char/walk-' + str(i) + '.png' for i in range(1,5)], True, 6, self.position)
         self.walk_left_sprite = self.walk_right_sprite.flip(True, False)
-        self.slash_right_sprite = draw.sprite(['image/char/slash_' + str(i) + '.png' for i in range(1,3)], False, 2, self.position)
+        self.slash_right_sprite = draw.sprite(['image/char/slash_' + str(i) + '.png' for i in range(1,3)], True, 2, self.position)
         self.slash_left_sprite = self.slash_right_sprite.flip(True, False)
+        self.sting_right_sprite = draw.sprite(['image/char/sting_' + str(i) + '.png' for i in range(1,3)], True, 2, self.position)
+        self.sting_left_sprite = self.sting_right_sprite.flip(True, False)
 
         self.sprite = self.static_right_sprite
         self.sprite = self.slash_right_sprite
+        self.sprite = self.sting_right_sprite
 
         self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size())
         self.stop()
@@ -303,7 +313,14 @@ class Near_Enemy(Human): #근거리
             self.walk()
 
     def sting(self):
-        pass
+        if (self.viewdir == Vleft):
+            self.sprite = self.sting_left_sprite
+        elif (self.viewdir == Vright):
+            self.sprite = self.sting_right_sprite
+        self.hp - (self.arm - self.atk) #적의 공격력을 끌어다 쓰는것은 고려해봐야 할듯
+        if (self.cri <= random.random()):
+            self.hp - (self.arm - self.atk * 2)
+
 
     def slash(self):
         if (self.viewdir == Vleft):
