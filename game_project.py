@@ -128,7 +128,7 @@ class Character(Human):
         self.sprite = self.slash_right_sprite
 
         self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size())
-        self.stop()
+        self.stop() #stop 상태로 초기화
         
     def control(self, keys): #기본적인 조작법
         if keys[K_RIGHT]:
