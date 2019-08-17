@@ -22,9 +22,17 @@ DISP = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("연습")
 painter = draw.painter(DISP)
 painter.append_bg('image/MapSunny.png')
+
+
 player = Character()
 playerHPbar = UI.Character_stat(player, (5, 5))
+painter.append(player)
+painter.append(playerHPbar)
 
+enemy_1 = Near_Enemy()
+enemyHPbar = UI.Enemy_stat(enemy_1, (0, 180))
+painter.append(enemy_1)
+painter.append(enemyHPbar)
 
 
 # 일단은 임시로 만들어두었음.
@@ -35,13 +43,7 @@ playerHPbar = UI.Character_stat(player, (5, 5))
 # 히트박스 레이어로 만들 것들은, 플레이어, 적, 플레이어 공격, 적 공격, (아이템...은 아직은 생각 안하고 있고)
 # 벽도 히트박스를 만들까 싶긴 한데, 굳이 지금은 할 필요가 있을까 싶네. 좌우 화면 벗어나는건 각각의 .update()에서 담당하게 했다.
 # 이걸 바꿀 필요가 있을까? 이것도 hitbox로 처리하는게 나을까?
-painter.append(player)
-painter.append(playerHPbar)
 
-enemy_1 = Near_Enemy()
-enemyHPbar = UI.Enemy_stat(enemy_1, (0, 180))
-painter.append(enemy_1)
-painter.append(enemyHPbar)
 
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
@@ -63,10 +65,12 @@ while True:
             sys.exit()
    
 
-    enemy_1.near_ai(player)
     player.control(pygame.key.get_pressed())
     player.update()
+    enemy_1.near_ai(player)
     enemy_1.update()
+
+
     painter.image_update()
     painter.draw()
 
