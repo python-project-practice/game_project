@@ -2,6 +2,7 @@ import os, sys
 import pygame
 from pygame.locals import *
 import draw
+import UI
 from game_project import Character, Near_Enemy
 from collision import collide_list_to_list
 
@@ -22,6 +23,7 @@ pygame.display.set_caption("연습")
 painter = draw.painter(DISP)
 painter.append_bg('image/MapSunny.png')
 player = Character()
+playerHPbar = UI.Character_stat(player, (5, 5))
 
 
 
@@ -34,9 +36,12 @@ player = Character()
 # 벽도 히트박스를 만들까 싶긴 한데, 굳이 지금은 할 필요가 있을까 싶네. 좌우 화면 벗어나는건 각각의 .update()에서 담당하게 했다.
 # 이걸 바꿀 필요가 있을까? 이것도 hitbox로 처리하는게 나을까?
 painter.append(player)
+painter.append(playerHPbar)
 
 enemy_1 = Near_Enemy()
+enemyHPbar = UI.Enemy_stat(enemy_1, (0, 180))
 painter.append(enemy_1)
+painter.append(enemyHPbar)
 
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
@@ -65,10 +70,10 @@ while True:
     painter.image_update()
     painter.draw()
 
-    pygame.draw.rect(DISP, WHITE, [0, 0, 400, 75])
-    if frame < 150: 
-        pygame.draw.rect(DISP, RED, [5, 5, 150 - frame, 30])
-    pygame.draw.rect(DISP, BLUE, [5, 40, 150, 30])    
+    #pygame.draw.rect(DISP, WHITE, [0, 0, 400, 75])
+    #if frame < 150: 
+    #    pygame.draw.rect(DISP, RED, [5, 5, 150 - frame, 30])
+    #pygame.draw.rect(DISP, BLUE, [5, 40, 150, 30])    
     
     fps = clock.get_fps()
     fpsmsg = gulim.render('fps: ' + str(int(fps)), 1, BLACK, WHITE)
