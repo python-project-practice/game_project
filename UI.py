@@ -1,26 +1,46 @@
+import pygame
+from vector import vector
 import game_project
 
-class Character_UI:
+RED = (255, 0, 0)
+BLUE = (0, 0, 255)
 
-    def draw_hp(self, hp):
-        self.hp = hp
-        if 
+class Character_stat:
+    def __init__(self, character, pos=(0,0)):
+        self.parent = character
+        self.pos = vector(*pos)
 
-    def update(self):
-        
+    def set_pos(pos):
+        self.pos = vector(*pos)
 
-class Enemy_UI:
+    def draw(self, surf):
+        if self.parent.hp > 0:
+            pygame.draw.rect(surf, RED, [self.pos.x, self.pos.y, self.parent.hp, 30])
+        else:
+            pass
 
-    def draw_E_hp(self, hp, attack_C):
+    def image_update(self):
+        pass
 
+class Enemy_stat:
+    def __init__(self, enemy, pos):
+        self.parent = enemy
+        self.pos = vector(*pos)
 
+    def set_pos(pos):
+        self.pos = vector(*pos)
 
+    def draw(self, surf):
+        if self.parent.hp > 0:
+            pygame.draw.rect(surf, BLUE, [self.parent.position.x + self.pos.x,
+                                          self.parent.position.y + self.pos.y,
+                                          self.parent.hp, 10])
+        else:
+            pass
 
-player = Character()
-enemy_1 = Near_Enemy()
-enemy_2 = Distance_Enemy()
+    def image_update(self):
+        pass
 
-ch = Character_UI()
-en = Enemy_UI()
-ch.draw_hp(player.hp, enemy_1.slash, enemy_1.sting, enemy_1.shoot)
-en.draw_E_hp()
+class fps:
+    def __init__(self, pos):
+        pass
