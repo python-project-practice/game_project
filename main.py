@@ -2,6 +2,7 @@ import os, sys
 import pygame
 from pygame.locals import *
 import draw
+
 from game_project import Character, Near_Enemy
 from collision import collide_list_to_list
 
@@ -35,8 +36,8 @@ player = Character()
 # 이걸 바꿀 필요가 있을까? 이것도 hitbox로 처리하는게 나을까?
 painter.append(player)
 
-enemy_1 = Near_Enemy()
-painter.append(enemy_1)
+#enemy_1 = Near_Enemy()
+#painter.append(enemy_1)
 
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
@@ -54,14 +55,13 @@ while True:
             sys.exit()
    
 
-    enemy_1.near_ai(player)
+#    enemy_1.near_ai(player)
     player.control(pygame.key.get_pressed())
     player.update()
-    enemy_1.update()
+#    enemy_1.update()
     painter.image_update()
     painter.draw()
 
-    painter.draw_bg('image/MapSunny.png')
     pygame.draw.rect(DISP, WHITE, [0, 0, 400, 75])
     if frame < 150: 
         pygame.draw.rect(DISP, RED, [5, 5, 150 - frame, 30])
