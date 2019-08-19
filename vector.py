@@ -18,6 +18,8 @@ class vector:
             return self.y
         elif(index == 2):
             return self.z
+        elif(isinstance(index, slice)):
+            return [self.x, self.y, self.z][index]
         else:
             raise IndexError('vector index out of range')
 

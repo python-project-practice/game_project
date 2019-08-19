@@ -10,7 +10,7 @@ class Character_stat:
         self.parent = character
         self.pos = vector(*pos)
 
-    def set_pos(pos):
+    def set_pos(self, pos):
         self.pos = vector(*pos)
 
     def draw(self, surf):
@@ -27,7 +27,7 @@ class Enemy_stat:
         self.parent = enemy
         self.pos = vector(*pos)
 
-    def set_pos(pos):
+    def set_pos(self, pos):
         self.pos = vector(*pos)
 
     def draw(self, surf):

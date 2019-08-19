@@ -127,10 +127,9 @@ class Character(Human):
         self.sting_left_sprite = self.sting_right_sprite.flip(True, False)
 
         self.sprite = self.static_right_sprite
-        self.sprite = self.slash_right_sprite
-        self.sprite = self.sting_right_sprite
 
         self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size())
+        self.atk_hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), False)
         self.stop() #stop 상태로 초기화
         
     def control(self, keys): #기본적인 조작법
@@ -180,6 +179,7 @@ class Character(Human):
         elif (self.viewdir == Vright):
             self.position.x += MOVE_SPEED
             self.sprite = self.walk_right_sprite
+        self.hitbox.move(self.position)
 
     def stop(self):
         self.speed.x = 0
@@ -263,6 +263,7 @@ class Near_Enemy(Human): #근거리
         self.sprite = self.sting_right_sprite
 
         self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size())
+        self.atk_hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), False)
         self.stop()
 
     def jump(self): #점프
@@ -287,6 +288,7 @@ class Near_Enemy(Human): #근거리
         elif (self.viewdir == Vright):
             self.position.x += MOVE_SPEED
             self.sprite = self.walk_right_sprite
+        self.hitbox.move(self.position)
 
     def stop(self):
         self.speed.x = 0
