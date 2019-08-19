@@ -22,7 +22,7 @@ import random
 import pygame
 from pygame.locals import *
 import draw
-from collision import hitbox
+#from collision import hitbox
 from vector import vector
 
 #++ 히트박스 클래스 고려하여 프로그래밍 ㄱㄱ
@@ -125,12 +125,15 @@ class Character(Human):
         self.slash_left_sprite = self.slash_right_sprite.flip(True, False)
         self.sting_right_sprite = draw.sprite(['image/char/sting_' + str(i) + '.png' for i in range(1,3)], True, 2, self.position)
         self.sting_left_sprite = self.sting_right_sprite.flip(True, False)
+        self.get_attack_right_sprite = draw.sprite(['image/char/get_attack_' + str(i) + '.png' for i in range(1, 4)], True, 3, self.position)
+        self.get_attack_left_sprite = self.get_attack_right_sprite.flip(True, False)
 
         self.sprite = self.static_right_sprite
         self.sprite = self.slash_right_sprite
         self.sprite = self.sting_right_sprite
+        self.sprite = self.get_attack_right_sprite
 
-        self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size())
+        #self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size())
         self.stop() #stop 상태로 초기화
         
     def control(self, keys): #기본적인 조작법
@@ -262,7 +265,7 @@ class Near_Enemy(Human): #근거리
         self.sprite = self.slash_right_sprite
         self.sprite = self.sting_right_sprite
 
-        self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size())
+        #self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size())
         self.stop()
 
     def jump(self): #점프

@@ -5,8 +5,10 @@ class hitbox(pygame.Rect):
         super().__init__(x, y, width, height) #pygame 메서드 상속
         self.parent = parent # 캐릭터 or 적을 가리킴
 
-    def get_attack(self, other): # 피격 판정
-        self.parent.get_attack(other)
+    def get_attack(self, other): # 피격 판정 항시 true
+        if self.parent.get_attack(other)
+
+    
         
 
 def collide_list_to_list(list1, list2): #히트박스로 이루어진 리스트
