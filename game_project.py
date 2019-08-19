@@ -131,12 +131,10 @@ class Character(Human):
         self.dead_right_sprite = draw.sprite(['image/char/get_attack_3.png'], True, 2, self.position)
         self.dead_left_sprite = self.dead_right_sprite.flip(True, False)
 
+        self.sting_cooltime = 0
+        self.default_sting_cooltime = 60
 
         self.sprite = self.static_right_sprite
-        self.sprite = self.slash_right_sprite
-        self.sprite = self.sting_right_sprite
-        self.sprite = self.get_attack_right_sprite
-        self.sprite = self.dead_right_sprite
 
         self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size())
         self.atk_hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), False)
@@ -214,13 +212,17 @@ class Character(Human):
             self.hp - (self.arm - self.atk * 2)
         
     def sting(self):
-        if (self.viewdir == Vleft):
-            self.sprite = self.sting_left_sprite
-        elif (self.viewdir == Vright):
-            self.sprite = self.sting_right_sprite
-        self.hp - (self.arm - self.atk)
-        if (self.cri <= random.random()):
-            self.hp - (self.arm - self.atk * 2)
+        if (self.sting_cooltime > 0):
+            pass
+        else:
+            self.sting_cooltime = self.default_sting_cooltime
+            if (self.viewdir == Vleft):
+                self.sprite = self.sting_left_sprite
+            elif (self.viewdir == Vright):
+                self.sprite = self.sting_right_sprite
+            self.hp - (self.arm - self.atk)
+            if (self.cri <= random.random()):
+                self.hp - (self.arm - self.atk * 2)
 
     def dead(self): #사망
         if self.hp == 0:
@@ -236,6 +238,7 @@ class Character(Human):
         self.sprite.image_update()
 
     def update(self):
+        self.sting_cooltime -= 1
         self.position += self.speed
         if(self.position.x < MAP_LEFT_LIMIT): #self.position.left < MAP_LEFT_LIMIT
             self.position.x = MAP_LEFT_LIMIT
@@ -265,9 +268,8 @@ class Near_Enemy(Human): #근거리
         self.viewdir = Vright #오른쪽
         self.onGround = True #캐릭터가 땅 위에 존재
 
-        self.frame = 0
-        self.cooltime = 30 #쿨타임
-
+        self.sting_cooltime = 0
+        self.default_sting_cooltime = 600
         self.static_right_sprite = draw.sprite(['image/char/static.png'], True, 1, self.position)
         self.static_left_sprite = self.static_right_sprite.flip(True, False) #좌우 대칭
         self.walk_right_sprite = draw.sprite(['image/char/walk-' + str(i) + '.png' for i in range(1,5)], True, 6, self.position)
@@ -337,14 +339,17 @@ class Near_Enemy(Human): #근거리
             self.walk()
 
     def sting(self):
-
-        if (self.viewdir == Vleft):
-            self.sprite = self.sting_left_sprite
-        elif (self.viewdir == Vright):
-            self.sprite = self.sting_right_sprite
-        self.hp - (self.arm - self.atk) #적의 공격력을 끌어다 쓰는것은 고려해봐야 할듯
-        if (self.cri <= random.random()):
-            self.hp - (self.arm - self.atk * 2)
+        if(self.sting_cooltime > 0):
+            pass
+        else:
+            self.sting_cooltime = self.default_sting_cooltime
+            if (self.viewdir == Vleft):
+                self.sprite = self.sting_left_sprite
+            elif (self.viewdir == Vright):
+                self.sprite = self.sting_right_sprite
+            self.hp - (self.arm - self.atk) #적의 공격력을 끌어다 쓰는것은 고려해봐야 할듯
+            if (self.cri <= random.random()):
+                self.hp - (self.arm - self.atk * 2)
 
     def slash(self):
         if (self.viewdir == Vleft):
@@ -377,6 +382,7 @@ class Near_Enemy(Human): #근거리
         self.sprite.image_update()
 
     def update(self):
+        self.sting_cooltime -= 1
         self.position += self.speed
 
         if not self.onGround:
