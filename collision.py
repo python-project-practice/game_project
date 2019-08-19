@@ -19,4 +19,4 @@ def collide_list_to_list(list1, list2): #히트박스로 이루어진 리스트
         indices = i.collideRect(list2) #list2에 충돌되는 히트박스롤 넣음
         for j in indices:
             i.get_attack(list2[j]) #상호충돌을 호출
-            list2[j].get_attack(i) #
+            list2[j].get_attack(i) 

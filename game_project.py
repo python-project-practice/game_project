@@ -108,7 +108,7 @@ class Human(metaclass=ABCMeta):
         pass
 
 class Character(Human):
-    def __init__(self, hp = 150, mp = 0, atk = 0, arm = 0, cri = 0.1): #기본 스텟/몹, 캐릭터의 위치 설계
+    def __init__(self, hp = 150, mp = 20, atk = 0, arm = 0, cri = 0.1): #기본 스텟/몹, 캐릭터의 위치 설계
         super().__init__(hp, mp, atk, arm, cri)  
         self.position = vector(60, GROUND_HEIGHT)
         self.speed = vector(0, 0) #속도. 매 프레임마다 위치+= 속도
