@@ -22,7 +22,7 @@ import random
 import pygame
 from pygame.locals import *
 import draw
-from collision import hitbox
+#from collision import hitbox
 from vector import vector
 
 #++ 히트박스 클래스 고려하여 프로그래밍 ㄱㄱ
@@ -125,9 +125,19 @@ class Character(Human):
         self.slash_left_sprite = self.slash_right_sprite.flip(True, False)
         self.sting_right_sprite = draw.sprite(['image/char/sting_' + str(i) + '.png' for i in range(1,3)], True, 2, self.position)
         self.sting_left_sprite = self.sting_right_sprite.flip(True, False)
+        self.get_attack_right_sprite = draw.sprite(['image/char/get_attack_' + str(i) + '.png' for i in range(1, 4)], True, 3, self.position)
+        self.get_attack_left_sprite = self.get_attack_right_sprite.flip(True, False)
+        self.dead_right_sprite = draw.sprite(['image/char/get_attack_3'], True, 2, self.position)
+        self.dead_left_sprite = self.dead_right_sprite.flip(True, False)
+
 
         self.sprite = self.static_right_sprite
+        self.sprite = self.slash_right_sprite
+        self.sprite = self.sting_right_sprite
+        self.sprite = self.get_attack_right_sprite
+        self.sprite = self.dead_right_sprite
 
+        #self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size())
         self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size())
         self.atk_hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), False)
         self.stop() #stop 상태로 초기화
@@ -195,6 +205,7 @@ class Character(Human):
         pass
 
     def slash(self):
+
         if (self.viewdir == Vleft):
             self.sprite = self.slash_left_sprite
         elif (self.viewdir == Vright):
@@ -213,7 +224,13 @@ class Character(Human):
             self.hp - (self.arm - self.atk * 2)
 
     def dead(self): #사망
-        pass
+        if self.hp == 0:
+            if (self.viewdir == Vleft):
+                self.sprite = self.dead_left_sprite
+            elif (self.viewdir == Vright):
+                self.sprite = self.dead_right_sprite
+        else:
+            pass
 
     def image_update(self):
         self.sprite.move(self.position)
@@ -249,6 +266,8 @@ class Near_Enemy(Human): #근거리
         self.viewdir = Vright #오른쪽
         self.onGround = True #캐릭터가 땅 위에 존재
 
+        self.cooltime = 30
+
         self.static_right_sprite = draw.sprite(['image/char/static.png'], True, 1, self.position)
         self.static_left_sprite = self.static_right_sprite.flip(True, False) #좌우 대칭
         self.walk_right_sprite = draw.sprite(['image/char/walk-' + str(i) + '.png' for i in range(1,5)], True, 6, self.position)
@@ -257,10 +276,14 @@ class Near_Enemy(Human): #근거리
         self.slash_left_sprite = self.slash_right_sprite.flip(True, False)
         self.sting_right_sprite = draw.sprite(['image/char/sting_' + str(i) + '.png' for i in range(1,3)], True, 2, self.position)
         self.sting_left_sprite = self.sting_right_sprite.flip(True, False)
+        self.dead_right_sprite = draw.sprite(['image/char/get_attack_3'], True, 2, self.position)
+        self.dead_left_sprite = self.dead_right_sprite.flip(True, False)
 
         self.sprite = self.static_right_sprite
         self.sprite = self.slash_right_sprite
         self.sprite = self.sting_right_sprite
+        self.sprite = self.get_attack_right_sprite
+        self.sprite = self.dead_right_sprite
 
         self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size())
         self.atk_hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), False)
@@ -288,7 +311,7 @@ class Near_Enemy(Human): #근거리
         elif (self.viewdir == Vright):
             self.position.x += MOVE_SPEED
             self.sprite = self.walk_right_sprite
-        self.hitbox.move(self.position)
+            self.hitbox.move(self.position)
 
     def stop(self):
         self.speed.x = 0
@@ -325,6 +348,7 @@ class Near_Enemy(Human): #근거리
 
 
     def slash(self):
+
         if (self.viewdir == Vleft):
             self.sprite = self.slash_left_sprite
         elif (self.viewdir == Vright):
@@ -340,7 +364,14 @@ class Near_Enemy(Human): #근거리
         pass
 
     def dead(self):
-        pass
+        if self.hp == 0:
+            if (self.viewdir == Vleft):
+                self.sprite = self.dead_left_sprite
+            elif (self.viewdir == Vright):
+                self.sprite = self.dead_right_sprite
+            self.sprite = None #캐릭터 사망시 객체 / 이미지 삭제
+        else:
+            pass
 
     def image_update(self):
         self.sprite.move(self.position)

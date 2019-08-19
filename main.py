@@ -5,7 +5,7 @@ import draw
 
 import UI
 from game_project import Character, Near_Enemy
-from collision import collide_list_to_list
+#from collision import collide_list_to_list
 
 
 '''
