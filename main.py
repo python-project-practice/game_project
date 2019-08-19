@@ -5,7 +5,7 @@ import draw
 
 import UI
 from game_project import Character, Near_Enemy
-#from collision import collide_list_to_list
+from collision import collide_list_to_list
 
 
 '''
@@ -75,6 +75,7 @@ while True:
     painter.draw()
 
     collide_list_to_list(hitbox_layer['player'], hitbox_layer['enemy'])
+
     #pygame.draw.rect(DISP, WHITE, [0, 0, 400, 75])
     #if frame < 150: 
     #    pygame.draw.rect(DISP, RED, [5, 5, 150 - frame, 30])

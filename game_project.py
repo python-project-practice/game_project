@@ -22,8 +22,9 @@ import random
 import pygame
 from pygame.locals import *
 import draw
-#from collision import hitbox
+from collision import hitbox
 from vector import vector
+import time
 
 #++ 히트박스 클래스 고려하여 프로그래밍 ㄱㄱ
 
@@ -127,7 +128,7 @@ class Character(Human):
         self.sting_left_sprite = self.sting_right_sprite.flip(True, False)
         self.get_attack_right_sprite = draw.sprite(['image/char/get_attack_' + str(i) + '.png' for i in range(1, 4)], True, 3, self.position)
         self.get_attack_left_sprite = self.get_attack_right_sprite.flip(True, False)
-        self.dead_right_sprite = draw.sprite(['image/char/get_attack_3'], True, 2, self.position)
+        self.dead_right_sprite = draw.sprite(['image/char/get_attack_3.png'], True, 2, self.position)
         self.dead_left_sprite = self.dead_right_sprite.flip(True, False)
 
 
@@ -137,7 +138,6 @@ class Character(Human):
         self.sprite = self.get_attack_right_sprite
         self.sprite = self.dead_right_sprite
 
-        #self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size())
         self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size())
         self.atk_hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), False)
         self.stop() #stop 상태로 초기화
@@ -205,7 +205,6 @@ class Character(Human):
         pass
 
     def slash(self):
-
         if (self.viewdir == Vleft):
             self.sprite = self.slash_left_sprite
         elif (self.viewdir == Vright):
@@ -266,7 +265,7 @@ class Near_Enemy(Human): #근거리
         self.viewdir = Vright #오른쪽
         self.onGround = True #캐릭터가 땅 위에 존재
 
-        self.cooltime = 30
+        self.cooltime = 30 #쿨타임
 
         self.static_right_sprite = draw.sprite(['image/char/static.png'], True, 1, self.position)
         self.static_left_sprite = self.static_right_sprite.flip(True, False) #좌우 대칭
@@ -276,7 +275,9 @@ class Near_Enemy(Human): #근거리
         self.slash_left_sprite = self.slash_right_sprite.flip(True, False)
         self.sting_right_sprite = draw.sprite(['image/char/sting_' + str(i) + '.png' for i in range(1,3)], True, 2, self.position)
         self.sting_left_sprite = self.sting_right_sprite.flip(True, False)
-        self.dead_right_sprite = draw.sprite(['image/char/get_attack_3'], True, 2, self.position)
+        self.get_attack_right_sprite = draw.sprite(['image/char/get_attack_' + str(i) + '.png' for i in range(1, 4)], True, 3, self.position)
+        self.get_attack_left_sprite = self.get_attack_right_sprite.flip(True, False)
+        self.dead_right_sprite = draw.sprite(['image/char/get_attack_3.png'], True, 2, self.position)
         self.dead_left_sprite = self.dead_right_sprite.flip(True, False)
 
         self.sprite = self.static_right_sprite
@@ -346,9 +347,7 @@ class Near_Enemy(Human): #근거리
         if (self.cri <= random.random()):
             self.hp - (self.arm - self.atk * 2)
 
-
     def slash(self):
-
         if (self.viewdir == Vleft):
             self.sprite = self.slash_left_sprite
         elif (self.viewdir == Vright):
@@ -356,6 +355,7 @@ class Near_Enemy(Human): #근거리
         self.hp - (self.arm - self.atk) #적의 공격력을 끌어다 쓰는것은 고려해봐야 할듯
         if (self.cri <= random.random()):
             self.hp - (self.arm - self.atk * 2)
+        
 
     def get_attack(self):
         pass
