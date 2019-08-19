@@ -11,7 +11,10 @@ class hitbox(pygame.Rect):
         self.top = pos[1]
 
     def __repr__(self):
-        return '<hitbox(' + str(x) + ', ' + str(y) + ', ' + str(width) + ', ' + str(height) + ')>'
+        return '<hitbox(' + str(self.x) + ', ' + str(self.y) + ', ' + str(self.width) + ', ' + str(self.height) + ')>'
+
+    def __str__(self):
+        return self.__repr__()
 
     def get_attack(self, other): # 피격 판정
         self.parent.get_attack(other)

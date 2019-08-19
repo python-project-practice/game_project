@@ -19,7 +19,7 @@ class vector:
         elif(index == 2):
             return self.z
         elif(isinstance(index, slice)):
-            return [self.x, self.y, self.z][index]
+            return [self.x, self.y, self.z][index] # len(vector(3,4,5)[0:1]) must be 1, not 3. I used list.
         else:
             raise IndexError('vector index out of range')
 
