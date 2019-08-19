@@ -4,7 +4,25 @@ import pygame
 from vector import vector
 
 class image():
-    def __init__(self, file, alpha=False, pos=(0,0)): #alpha = 투명도
+    '''
+    image(file, alpha=False, pos=(0,0), adjust_pos=(0,0))
+        file = filename, image or surface
+        alpha = whether to use convert_alpha()
+        pos = drawing point(leftup)
+        adjust_pos = drawing point(use when you need to adjust start position of image. not_accesible)
+            works like sceen.blit(pos + adjust_pos)
+
+        get()-> return surface that image have.
+        get_size()->(size x, size y)
+        set_size(x,y)-> set size to x, y
+        flip(x_bool, y_bool): flip by x axis and(or) y axis
+        move(x,y): set pos to x,y
+        draw(surf): blit image on surf surface
+        update(): do nothing, because image does!
+
+    store image and blit on screen
+    '''
+    def __init__(self, file, alpha=False, pos=(0,0), adjust_pos=(0,0)): #alpha = 투명도
         if type(file) is str:
             self.image = pygame.image.load(file)
             self.alpha = False
@@ -18,13 +36,15 @@ class image():
             self.image = file
             self.alpha = alpha
 
+        self.imagesize = self.image.get_size()
         self.pos = vector(*pos)
+        self.__adjust = vector(*adjust_pos)
 
     def get(self):
         return self.image
 
     def get_size(self):
-        return self.image.get_size()
+        return self.imagesize
 
     def set_size(self, x, y):
         retimg = image(self)
@@ -41,20 +61,27 @@ class image():
         self.pos = pos
 
     def draw(self, surf):
-        surf.blit(self.image, (self.pos.x, self.pos.y))
+        surf.blit(self.image, (self.pos.x + self.__adjust.x, self.pos.y + self.__adjust.y))
 
     def image_update(self):
         # do absolutely nothing
         pass
 
 class sprite:
-    def __init__(self, imagenamelist = [], alpha=False, update_period = 1, pos=(0,0)):
+    def __init__(self, imagenamelist = [], alpha=False, update_period = 1, pos=(0,0), adjust_pos = []):
         self.imagelist = [image(i, alpha, pos) for i in imagenamelist]
         self.pos = vector(*pos)
         self.__picindex = 0 # 몇 번째 사진을 비출 것인지
         self.update_period = update_period # 몇 프레임마다 사진을 갱신할 것인지
         self.__frame = 0 # 현재 생성 후 몇 프레임이 지났는지
         self.__len = len(self.imagelist)
+        self.__adjust = adjust_pos
+        if(len(imagenamelist) > len(adjust_pos)):
+            t = len(imagenamelist) - len(adjust_pos)
+            self.__adjust.extend([vector(0,0)] * t)
+            del t
+        else:
+            self.__adjust = self.__adjust[:len(imagenamelist)]
 
     def __len__(self):
         return self.__len
@@ -72,7 +99,9 @@ class sprite:
         return sprite([i.flip(xbool, ybool) for i in self], update_period=self.update_period, pos=self.pos)
 
     def draw(self, surf):
-        surf.blit(self.imagelist[self.__picindex].get(), (self.pos.x, self.pos.y))
+        surf.blit(self.imagelist[self.__picindex].get(),
+                  (self.pos.x + self.__adjust[self.__picindex].x, self.pos.y + self.__adjust[self.__picindex].y)
+                 )
 
     def move(self, pos):
         self.pos = vector(*pos)
