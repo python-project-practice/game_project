@@ -22,7 +22,7 @@ import random
 import pygame
 from pygame.locals import *
 import draw
-#from collision import hitbox
+from collision import hitbox
 from vector import vector
 
 #++ 히트박스 클래스 고려하여 프로그래밍 ㄱㄱ
@@ -84,7 +84,7 @@ class Human(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_attack(self): #피격 판정
+    def get_attack(self, other, memo=''): #피격 판정. other:Human에게 (memo:str)형태로
         pass
 
     @abstractmethod
@@ -127,7 +127,7 @@ class Character(Human):
         self.sting_left_sprite = self.sting_right_sprite.flip(True, False)
         self.get_attack_right_sprite = draw.sprite(['image/char/get_attack_' + str(i) + '.png' for i in range(1, 4)], True, 3, self.position)
         self.get_attack_left_sprite = self.get_attack_right_sprite.flip(True, False)
-        self.dead_right_sprite = draw.sprite(['image/char/get_attack_3'], True, 2, self.position)
+        self.dead_right_sprite = draw.sprite(['image/char/get_attack_3.png'], True, 2, self.position)
         self.dead_left_sprite = self.dead_right_sprite.flip(True, False)
 
 
@@ -198,8 +198,8 @@ class Character(Human):
         if self.viewdir == Vleft:
             self.sprite = self.static_left_sprite
 
-    def get_attack(self): #피격 판정
-        pass
+    def get_attack(self, other, memo=''): #피격 판정
+        self.hp -= 1
 
     def rigidity(self): #경직
         pass
@@ -276,14 +276,10 @@ class Near_Enemy(Human): #근거리
         self.slash_left_sprite = self.slash_right_sprite.flip(True, False)
         self.sting_right_sprite = draw.sprite(['image/char/sting_' + str(i) + '.png' for i in range(1,3)], True, 2, self.position)
         self.sting_left_sprite = self.sting_right_sprite.flip(True, False)
-        self.dead_right_sprite = draw.sprite(['image/char/get_attack_3'], True, 2, self.position)
+        self.dead_right_sprite = draw.sprite(['image/char/get_attack_3.png'], True, 2, self.position)
         self.dead_left_sprite = self.dead_right_sprite.flip(True, False)
 
         self.sprite = self.static_right_sprite
-        self.sprite = self.slash_right_sprite
-        self.sprite = self.sting_right_sprite
-        self.sprite = self.get_attack_right_sprite
-        self.sprite = self.dead_right_sprite
 
         self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size())
         self.atk_hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), False)
@@ -357,7 +353,7 @@ class Near_Enemy(Human): #근거리
         if (self.cri <= random.random()):
             self.hp - (self.arm - self.atk * 2)
 
-    def get_attack(self):
+    def get_attack(self, other, memo=''):
         pass
 
     def rigidity(self):

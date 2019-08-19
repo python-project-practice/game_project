@@ -1,11 +1,10 @@
-import os, sys
 import pygame
 from pygame.locals import *
 import draw
 
 import UI
 from game_project import Character, Near_Enemy
-#from collision import collide_list_to_list
+from collision import collide_list_to_list
 
 
 '''
@@ -58,14 +57,15 @@ frame_hp = 0
 clock = pygame.time.Clock()
 
 gulim = pygame.font.SysFont('Gulim', 36)
+running = True
 
-while True:
+while running:
     clock.tick(60)
 
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
-            sys.exit()
+            running = False
    
     player.control(pygame.key.get_pressed())
     player.update()
