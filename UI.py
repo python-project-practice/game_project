@@ -10,14 +10,14 @@ class Character_stat:
         self.parent = character
         self.pos = vector(*pos)
 
-    def set_pos(pos):
+    def set_pos(self, pos):
         self.pos = vector(*pos)
 
     def draw(self, surf):
         if self.parent.hp > 0:
             pygame.draw.rect(surf, RED, [self.pos.x, self.pos.y, self.parent.hp, 30])
-        else:
-            pass
+        if self.parent.mp > 0:
+            pygame.draw.rect(surf, BLUE, [self.pos.x, self.pos.y + 50, self.parent.mp, 30])
 
     def image_update(self):
         pass
@@ -27,7 +27,7 @@ class Enemy_stat:
         self.parent = enemy
         self.pos = vector(*pos)
 
-    def set_pos(pos):
+    def set_pos(self, pos):
         self.pos = vector(*pos)
 
     def draw(self, surf):
