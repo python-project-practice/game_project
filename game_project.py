@@ -256,15 +256,16 @@ class Character(Human):
 
 class Near_Enemy(Human): #근거리
 
-    def __init__(self, hp = 150, mp = 0, atk = 0, arm = 0, cri = 0.1):
+    def __init__(self, hp = 150, mp = 0, atk = 0, arm = 0, cri = 0.1, position = (600,GROUND_HEIGHT)):
         super().__init__(hp, mp, atk, arm, cri)  
-        self.position = vector(600, GROUND_HEIGHT)
+        self.position = vector(*position)
         self.speed = vector(0, 0) #속도. 매 프레임마다 위치+= 속도
 
         self.motion = 0  #모션
         self.viewdir = Vright #오른쪽
         self.onGround = True #캐릭터가 땅 위에 존재
 
+        self.frame = 0
         self.cooltime = 30 #쿨타임
 
         self.static_right_sprite = draw.sprite(['image/char/static.png'], True, 1, self.position)
@@ -328,7 +329,7 @@ class Near_Enemy(Human): #근거리
         elif -100 < dist < 100:
             self.stop()
             self.sting()
-        elif dist > 100:
+        elif dist >= 100:
             self.left()
             self.walk()
         else:
@@ -336,6 +337,7 @@ class Near_Enemy(Human): #근거리
             self.walk()
 
     def sting(self):
+
         if (self.viewdir == Vleft):
             self.sprite = self.sting_left_sprite
         elif (self.viewdir == Vright):
@@ -407,6 +409,9 @@ class Distance_Enemy(Human): #원거리
     def dead(self):
         pass
 
+class Projectile:
+    def __init__(self):
+        pass
 '''
 class Boss(Near_Enemy, Distance_Enemy): #다중상속 -> 근/원거리 공격 포함
 
