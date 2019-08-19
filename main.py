@@ -64,7 +64,6 @@ while running:
 
     for event in pygame.event.get():
         if event.type == QUIT:
-            pygame.quit()
             running = False
    
     player.control(pygame.key.get_pressed())
@@ -88,4 +87,4 @@ while running:
     pygame.display.update()
 
     frame += 1
-    
+pygame.quit()
