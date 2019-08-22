@@ -209,7 +209,7 @@ class Character(Human):
             self.hp -= (other.atk - self.arm)
             if other.cri <= random.random():
                 self.hp -= (other.atk * 2 - self.arm)
-                            if(self.hp <= 0):
+            if(self.hp <= 0):
                 self.dead()
         else:
             pass
@@ -432,7 +432,6 @@ class Near_Enemy(Human): #근거리
                 self.sprite = self.dead_left_sprite
             elif (self.viewdir == Vright):
                 self.sprite = self.dead_right_sprite
-            self.sprite = None #캐릭터 사망시 객체 / 이미지 삭제
         else:
             pass
 
