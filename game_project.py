@@ -47,7 +47,7 @@ GRAVITY_CONSTANT = vector(0, -8 * temp_h / (temp_t ** 2)) # gain speed (rightwar
 # human 클래스에 character, enemy가 공유함
 class Human(metaclass=ABCMeta):
 
-    def __init__(self, hp = 150, mp = 0, atk = 0, arm = 0, cri = 0.1): #기본 스텟/몹, 캐릭터의 위치 설계
+    def __init__(self, hp = 150, mp = 0, atk = 10, arm = 0, cri = 0.1): #기본 스텟/몹, 캐릭터의 위치 설계
         self.hp = hp
         self.mp = mp
         self.atk = atk
@@ -109,7 +109,7 @@ class Human(metaclass=ABCMeta):
         pass
 
 class Character(Human):
-    def __init__(self, hp = 150, mp = 20, atk = 0, arm = 0, cri = 0.1): #기본 스텟/몹, 캐릭터의 위치 설계
+    def __init__(self, hp = 150, mp = 20, atk = 10, arm = 0, cri = 0.1): #기본 스텟/몹, 캐릭터의 위치 설계
         super().__init__(hp, mp, atk, arm, cri)  
         self.position = vector(60, GROUND_HEIGHT)
         self.speed = vector(0, 0) #속도. 매 프레임마다 위치+= 속도
@@ -206,9 +206,11 @@ class Character(Human):
     def get_attack(self, other, memo=''): #피격 판정
         if (memo == 'attack'):
             self.rigidity()
-            self.hp -= (self.arm - other.atk)
+            self.hp -= (other.atk - self.arm)
             if other.cri <= random.random():
-                self.hp -= (self.arm - other.atk * 2)
+                self.hp -= (other.atk * 2 - self.arm)
+            if(self.hp <= 0):
+                self.dead()
         else:
             pass
 
@@ -218,10 +220,8 @@ class Character(Human):
         self.atk_hitbox.check = False
         if (self.viewdir == Vleft):
             self.sprite = self.get_attack_left_sprite
-            self.position -= (20, 0)
         elif (self.viewdir == Vright):
             self.sprite = self.get_attack_right_sprite
-            self.position += (20, 0)
         else:
             pass
 
@@ -248,7 +248,7 @@ class Character(Human):
     def dead(self): #사망
         self.hitbox.check=False
         self.atk_hitbox.check = False
-        if self.hp == 0:
+        if self.hp <= 0:
             if (self.viewdir == Vleft):
                 self.sprite = self.dead_left_sprite
             elif (self.viewdir == Vright):
@@ -290,7 +290,7 @@ class Character(Human):
 
 class Near_Enemy(Human): #근거리
 
-    def __init__(self, hp = 150, mp = 0, atk = 0, arm = 0, cri = 0.1, position = (600,GROUND_HEIGHT)):
+    def __init__(self, hp = 150, mp = 0, atk = 10, arm = 0, cri = 0.1, position = (600, GROUND_HEIGHT)):
         super().__init__(hp, mp, atk, arm, cri)  
         self.position = vector(*position)
         self.speed = vector(0, 0) #속도. 매 프레임마다 위치+= 속도
@@ -405,10 +405,11 @@ class Near_Enemy(Human): #근거리
     def get_attack(self, other, memo=''):
         if (memo == 'attack'):
             self.rigidity()
-            self.hp -= (self.arm - other.atk)
+            self.hp -= (other.atk - self.arm)
             if other.cri <= random.random():
-                self.hp -= (self.arm - other.atk * 2)
-
+                self.hp -= (other.atk * 2 - self.arm)
+            if(self.hp <= 0):
+                self.dead()
         else:
             pass
         
@@ -426,7 +427,7 @@ class Near_Enemy(Human): #근거리
     def dead(self):
         self.atk_hitbox.check = False
         self.hitbox.check = False
-        if self.hp == 0:
+        if self.hp <= 0:
             if (self.viewdir == Vleft):
                 self.sprite = self.dead_left_sprite
             elif (self.viewdir == Vright):
@@ -457,7 +458,7 @@ class Near_Enemy(Human): #근거리
             self.position.y = GROUND_HEIGHT
             self.speed = vector(0, 0)
 
-        if self.hp == 0:
+        if self.hp <= 0:
             self.dead()
 
     def draw(self, surf):
