@@ -28,10 +28,6 @@ import time
 
 #++ 히트박스 클래스 고려하여 프로그래밍 ㄱㄱ
 
-Stop = 'stop'
-Walk = 'walk'
-Jump = 'jump'
-
 Vleft = 'view_left'
 Vright = 'view_right'
 
@@ -60,9 +56,12 @@ class Human(metaclass=ABCMeta):
         self.position = vector(0, 0)  #위치
         self.speed = vector(0, 0) #속도, 매 프레임마다 위치+= 속도
         self.viewdir = Vright #오른쪽 방향으로 일단 고정 -> 이게 없으면 방향이 고정됨 -> 고려해봐야 함
-        # self.act = 'stop' #여러 프레임이 걸리는 행동이 있을 거 아냐 그럴 때 지금 무슨 행동을 실행하고 있는지
-        # self.actframe = 0 # 여러 프레임이 걸리는 행동일 경우 지금 몇 프레임째 실행하고 있는지
+        self.act = 'stop' #여러 프레임이 걸리는 행동이 있을 거 아냐 그럴 때 지금 무슨 행동을 실행하고 있는지
+        self.actframe = 0 # 여러 프레임이 걸리는 행동일 경우 몇 프레임 후에 행동이 끝나는지
         self.onGround = True #캐릭터가 땅 위에 존재
+
+    def __str__(self):
+        return __name__ + " at (" + str(self.position) + ")"
 
     @abstractmethod 
     def jump(self): #점프
@@ -141,6 +140,10 @@ class Character(Human):
         self.stop() #stop 상태로 초기화
         
     def control(self, keys): #기본적인 조작법
+        if(self.act != 'stop'):
+            if(self.actframe > 0):
+                return
+
         if keys[K_RIGHT]:
             self.right()
             self.walk()
@@ -215,6 +218,8 @@ class Character(Human):
         if (self.sting_cooltime > 0):
             pass
         else:
+            self.act = 'sting'
+            self.actframe = 6
             self.sting_cooltime = self.default_sting_cooltime
             if (self.viewdir == Vleft):
                 self.sprite = self.sting_left_sprite
@@ -238,6 +243,10 @@ class Character(Human):
         self.sprite.image_update()
 
     def update(self):
+        if(self.act != 'stop'):
+            self.actframe -= 1
+            if(self.actframe == 0):
+                self.act = 'stop'
         self.sting_cooltime -= 1
         self.position += self.speed
         if(self.position.x < MAP_LEFT_LIMIT): #self.position.left < MAP_LEFT_LIMIT
