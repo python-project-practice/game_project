@@ -29,10 +29,6 @@ import UI
 
 #++ 히트박스 클래스 고려하여 프로그래밍 ㄱㄱ
 
-Stop = 'stop'
-Walk = 'walk'
-Jump = 'jump'
-
 Vleft = 'view_left'
 Vright = 'view_right'
 
@@ -61,9 +57,12 @@ class Human(metaclass=ABCMeta):
         self.position = vector(0, 0)  #위치
         self.speed = vector(0, 0) #속도, 매 프레임마다 위치+= 속도
         self.viewdir = Vright #오른쪽 방향으로 일단 고정 -> 이게 없으면 방향이 고정됨 -> 고려해봐야 함
-        # self.act = 'stop' #여러 프레임이 걸리는 행동이 있을 거 아냐 그럴 때 지금 무슨 행동을 실행하고 있는지
-        # self.actframe = 0 # 여러 프레임이 걸리는 행동일 경우 지금 몇 프레임째 실행하고 있는지
+        self.act = 'stop' #여러 프레임이 걸리는 행동이 있을 거 아냐 그럴 때 지금 무슨 행동을 실행하고 있는지
+        self.actframe = 0 # 여러 프레임이 걸리는 행동일 경우 몇 프레임 후에 행동이 끝나는지
         self.onGround = True #캐릭터가 땅 위에 존재
+
+    def __str__(self):
+        return __name__ + " at (" + str(self.position) + ")"
 
     @abstractmethod 
     def jump(self): #점프
@@ -137,9 +136,16 @@ class Character(Human):
         self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), 'static')
         self.atk_hitbox_sting = hitbox(self, self.position.x, self.position.y, 200, 160, 'sting')
         self.atk_hitbox_slash = hitbox(self, self.position.x, self.position.y, 180, 160, 'slash')
+        self.sting_cooltime = 0
+        self.default_sting_cooltime = 30
+
         self.stop() #stop 상태로 초기화
         
     def control(self, keys): #기본적인 조작법
+        if(self.act != 'stop'):
+            if(self.actframe > 0):
+                return
+
         if keys[K_RIGHT]:
             self.right()
             self.walk()
@@ -221,10 +227,16 @@ class Character(Human):
             self.sprite = self.slash_right_sprite
         
     def sting(self):
-        if (self.viewdir == Vleft):
-            self.sprite = self.sting_left_sprite
-        elif (self.viewdir == Vright):
-            self.sprite = self.sting_right_sprite
+        if (self.sting_cooltime > 0):
+            pass
+        else:
+            self.act = 'sting'
+            self.actframe = 6
+            self.sting_cooltime = self.default_sting_cooltime
+            if (self.viewdir == Vleft):
+                self.sprite = self.sting_left_sprite
+            elif (self.viewdir == Vright):
+                self.sprite = self.sting_right_sprite
 
     def dead(self): #사망
         if self.hp == 0:
@@ -242,6 +254,12 @@ class Character(Human):
     def update(self):
         self.hitbox.move(self.position)
         self.hitbox.resize(*self.sprite.get_size())
+        if(self.act != 'stop'):
+            self.actframe -= 1
+            if(self.actframe == 0):
+                self.act = 'stop'
+        self.sting_cooltime -= 1
+
         self.position += self.speed
         if(self.position.x < MAP_LEFT_LIMIT): #self.position.left < MAP_LEFT_LIMIT
             self.position.x = MAP_LEFT_LIMIT
@@ -262,19 +280,17 @@ class Character(Human):
 
 class Near_Enemy(Human): #근거리
 
-    def __init__(self, hp = 150, mp = 0, atk = 0, arm = 0, cri = 0.1):
+    def __init__(self, hp = 150, mp = 0, atk = 0, arm = 0, cri = 0.1, position = (600,GROUND_HEIGHT)):
         super().__init__(hp, mp, atk, arm, cri)  
-        self.position = vector(600, GROUND_HEIGHT)
+        self.position = vector(*position)
         self.speed = vector(0, 0) #속도. 매 프레임마다 위치+= 속도
 
         self.motion = 0  #모션
         self.viewdir = Vright #오른쪽
         self.onGround = True #캐릭터가 땅 위에 존재
 
-        self.cooltime_1 = 1 #쿨타임 책정
-        self.cooltime_2 = 1
-        self.last_sting = pygame.time.get_ticks()
-        self.last_slash = pygame.time.get_ticks()
+        self.sting_cooltime = 0
+        self.default_sting_cooltime = 30
 
         self.static_right_sprite = draw.sprite(['image/char/static.png'], True, 1, self.position)
         self.static_left_sprite = self.static_right_sprite.flip(True, False) #좌우 대칭
@@ -341,7 +357,8 @@ class Near_Enemy(Human): #근거리
         elif -70 < dist < 70:
             self.stop()
             self.sting()
-        elif dist > 70:
+
+        elif dist >= 70:
             self.left()
             self.walk()
         else:
@@ -351,29 +368,16 @@ class Near_Enemy(Human): #근거리
         self.stop()
         '''
     def sting(self):
-        now_1 = pygame.time.get_ticks()
-        if (now_1 - self.last_sting <= self.cooltime_1 * 1000):
+        if(self.sting_cooltime > 0):
             pass
         else:
-            self.last_sting = now_1
-            self.sprite = self.sting_right_sprite
-
+            self.sting_cooltime = self.default_sting_cooltime
             if (self.viewdir == Vleft):
                 self.sprite = self.sting_left_sprite
             elif (self.viewdir == Vright):
                 self.sprite = self.sting_right_sprite
 
     def slash(self):
-        if self.last_sting:
-            now_2 = self.last_sting
-            if (now_2 - self.last_slash <= self.cooltime_2 * 1000):
-                pass
-            else:
-                self.sprite = self.slash_right_sprite
-
-        else:
-            pass
-
         if (self.viewdir == Vleft):
             self.sprite = self.slash_left_sprite
         elif (self.viewdir == Vright):
@@ -414,6 +418,7 @@ class Near_Enemy(Human): #근거리
     def update(self):
         self.hitbox.move(self.position)
         self.hitbox.resize(*self.sprite.get_size())
+        self.sting_cooltime -= 1
         self.position += self.speed
         if not self.onGround:
             self.speed += GRAVITY_CONSTANT
@@ -449,6 +454,9 @@ class Distance_Enemy(Human): #원거리
     def dead(self):
         pass
 
+class Projectile:
+    def __init__(self):
+        pass
 '''
 class Boss(Near_Enemy, Distance_Enemy): #다중상속 -> 근/원거리 공격 포함
 

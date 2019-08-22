@@ -3,7 +3,7 @@ from pygame.locals import *
 import draw
 
 import UI
-from game_project import Character, Near_Enemy
+from game_project import Character, Near_Enemy, GROUND_HEIGHT
 from collision import collide_list_to_list
 
 
@@ -35,19 +35,15 @@ enemyHPbar = UI.Enemy_stat(enemy_1, (0, 180))
 painter.append(enemy_1)
 painter.append(enemyHPbar)
 
+enemy_2 = Near_Enemy(position=(550, GROUND_HEIGHT))
+enemy2HPbar = UI.Enemy_stat(enemy_2, (0, 180))
+painter.append(enemy_2)
+painter.append(enemy2HPbar)
+
 hitbox_layer = {'player':[player.hitbox],            'enemy':[enemy_1.hitbox],          'item': [],
                 'player_attack_sting':[player.atk_hitbox_sting], 'enemy_attack_sting':[enemy_1.atk_hitbox_sting], 'throwable':[],
                 'player_attack_slash':[player.atk_hitbox_slash], 'enemy_attack_slash':[enemy_1.atk_hitbox_slash]
                }
-# 일단은 임시로 만들어두었음.
-# 매 프레임이 끝날 때 쯤 어디에 collision 모듈을 이용해서 충돌처리를 할 생각이다.
-# collision.collide_list_to_list(hitbox_layer['player'], hitbox_layer['enemy_attack'])
-    # 그러면 안쪽에서 hitbox_layer['player'][0].get_hit(hitbox_layer['enemy_attack'][0])를 불러서 충돌시 자율적으로 행동하게 하는거지.
-# 이렇게 하면 되겠지?? hitbox_layer에 적 공격과 적 자체, 캐릭터의 공격과 캐릭터 자체를 따로 넣고 싶음.
-# 히트박스 레이어로 만들 것들은, 플레이어, 적, 플레이어 공격, 적 공격, (아이템...은 아직은 생각 안하고 있고)
-# 벽도 히트박스를 만들까 싶긴 한데, 굳이 지금은 할 필요가 있을까 싶네. 좌우 화면 벗어나는건 각각의 .update()에서 담당하게 했다.
-# 이걸 바꿀 필요가 있을까? 이것도 hitbox로 처리하는게 나을까?
-
 
 WHITE = (255, 255, 255)
 RED = (255, 0, 0)
@@ -66,7 +62,6 @@ while running:
 
     for event in pygame.event.get():
         if event.type == QUIT:
-            pygame.quit()
             running = False
    
     player.control(pygame.key.get_pressed())
@@ -75,6 +70,8 @@ while running:
     enemy_1.near_ai(player)
 
     enemy_1.update()
+    enemy_2.near_ai(player)
+    enemy_2.update()
     painter.image_update()
     painter.draw()
 
@@ -84,10 +81,6 @@ while running:
     collide_list_to_list(hitbox_layer['player'], hitbox_layer['enemy_attack_sting'])
     collide_list_to_list(hitbox_layer['player'], hitbox_layer['enemy_attack_slash'])
 
-    #pygame.draw.rect(DISP, WHITE, [0, 0, 400, 75])
-    #if frame < 150: 
-    #    pygame.draw.rect(DISP, RED, [5, 5, 150 - frame, 30])
-    #pygame.draw.rect(DISP, BLUE, [5, 40, 150, 30])    
     
     fps = clock.get_fps()
     fpsmsg = gulim.render('fps: ' + str(int(fps)), 1, BLACK, WHITE)
@@ -96,3 +89,5 @@ while running:
     pygame.display.update()
 
     frame += 1
+pygame.quit()
+
