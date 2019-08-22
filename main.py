@@ -30,6 +30,7 @@ playerHPbar = UI.Character_stat(player, (5, 5))
 painter.append(player)
 painter.append(playerHPbar)
 
+
 enemy_1 = Near_Enemy()
 enemyHPbar = UI.Enemy_stat(enemy_1, (0, 180))
 painter.append(enemy_1)
@@ -57,9 +58,10 @@ clock = pygame.time.Clock()
 gulim = pygame.font.SysFont('Gulim', 36)
 running = True
 
+
 while running:
     clock.tick(60)
-
+    
     for event in pygame.event.get():
         if event.type == QUIT:
             running = False

@@ -109,7 +109,7 @@ class Human(metaclass=ABCMeta):
         pass
 
 class Character(Human):
-    def __init__(self, hp = 150, mp = 20, atk = 0, arm = 0, cri = 0.1): #기본 스텟/몹, 캐릭터의 위치 설계
+    def __init__(self, hp = 150, mp = 20, atk = 30, arm = 10, cri = 0.1): #기본 스텟/몹, 캐릭터의 위치 설계
         super().__init__(hp, mp, atk, arm, cri)  
         self.position = vector(60, GROUND_HEIGHT)
         self.speed = vector(0, 0) #속도. 매 프레임마다 위치+= 속도
@@ -126,7 +126,7 @@ class Character(Human):
         self.slash_left_sprite = self.slash_right_sprite.flip(True, False)
         self.sting_right_sprite = draw.sprite(['image/char/sting_' + str(i) + '.png' for i in range(1,3)], True, 2, self.position)
         self.sting_left_sprite = self.sting_right_sprite.flip(True, False)
-        self.get_attack_right_sprite = draw.sprite(['image/char/get_attack_' + str(i) + '.png' for i in range(1, 4)], True, 3, self.position)
+        self.get_attack_right_sprite = draw.sprite(['image/char/get_attack_1.png'], True, 3, self.position)
         self.get_attack_left_sprite = self.get_attack_right_sprite.flip(True, False)
         self.dead_right_sprite = draw.sprite(['image/char/get_attack_3.png'], True, 2, self.position)
         self.dead_left_sprite = self.dead_right_sprite.flip(True, False)
@@ -206,22 +206,20 @@ class Character(Human):
     def get_attack(self, other, memo=''): #피격 판정
         if (memo == 'attack'):
             self.rigidity()
-            self.hp -= (self.arm - other.atk)
+            self.hp -= (other.atk - self.arm)
             if other.cri <= random.random():
-                self.hp -= (self.arm - other.atk * 2)
+                self.hp -= (other.atk * 2 - self.arm)
         else:
             pass
 
     def rigidity(self): #경직
         self.act = 'stun'
-        self.actframe = 60
+        self.actframe = 10
         self.atk_hitbox.check = False
         if (self.viewdir == Vleft):
             self.sprite = self.get_attack_left_sprite
-            self.position -= (20, 0)
         elif (self.viewdir == Vright):
             self.sprite = self.get_attack_right_sprite
-            self.position += (20, 0)
         else:
             pass
 
@@ -290,7 +288,7 @@ class Character(Human):
 
 class Near_Enemy(Human): #근거리
 
-    def __init__(self, hp = 150, mp = 0, atk = 0, arm = 0, cri = 0.1, position = (600,GROUND_HEIGHT)):
+    def __init__(self, hp = 150, mp = 0, atk = 30, arm = 10, cri = 0.1, position = (600,GROUND_HEIGHT)):
         super().__init__(hp, mp, atk, arm, cri)  
         self.position = vector(*position)
         self.speed = vector(0, 0) #속도. 매 프레임마다 위치+= 속도
@@ -310,7 +308,7 @@ class Near_Enemy(Human): #근거리
         self.slash_left_sprite = self.slash_right_sprite.flip(True, False)
         self.sting_right_sprite = draw.sprite(['image/char/sting_' + str(i) + '.png' for i in range(1,3)], True, 2, self.position)
         self.sting_left_sprite = self.sting_right_sprite.flip(True, False)
-        self.get_attack_right_sprite = draw.sprite(['image/char/get_attack_' + str(i) + '.png' for i in range(1, 4)], True, 3, self.position)
+        self.get_attack_right_sprite = draw.sprite(['image/char/get_attack_1.png'], True, 3, self.position)
         self.get_attack_left_sprite = self.get_attack_right_sprite.flip(True, False)
 
         self.dead_right_sprite = draw.sprite(['image/char/get_attack_3.png'], True, 2, self.position)
@@ -405,9 +403,9 @@ class Near_Enemy(Human): #근거리
     def get_attack(self, other, memo=''):
         if (memo == 'attack'):
             self.rigidity()
-            self.hp -= (self.arm - other.atk)
+            self.hp -= (other.atk - self.arm)
             if other.cri <= random.random():
-                self.hp -= (self.arm - other.atk * 2)
+                self.hp -= (other.atk * 2 - self.arm)
 
         else:
             pass
@@ -415,7 +413,7 @@ class Near_Enemy(Human): #근거리
     def rigidity(self):
         self.atk_hitbox.check = False
         self.act = 'stun'
-        self.actframe = 60
+        self.actframe = 10
         if (self.viewdir == Vleft):
             self.sprite = self.get_attack_left_sprite
         elif (self.viewdir == Vright):
