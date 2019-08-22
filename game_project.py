@@ -177,6 +177,7 @@ class Character(Human):
                 self.sprite = self.static_right_sprite
             if self.viewdir == Vleft:
                 self.sprite = self.static_left_sprite
+            self.atk_hitbox.check = False
 
     def left(self): #좌측 보기?
         self.viewdir = Vleft
@@ -192,7 +193,7 @@ class Character(Human):
             self.position.x += MOVE_SPEED
             self.sprite = self.walk_right_sprite
             self.hitbox.move(self.position)
-            self.atk_hitbox.move(self.position)
+            self.atk_hitbox.check = False
 
     def stop(self):
         self.speed.x = 0
@@ -200,9 +201,10 @@ class Character(Human):
             self.sprite = self.static_right_sprite
         if self.viewdir == Vleft:
             self.sprite = self.static_left_sprite
+        self.atk_hitbox.check = False
 
     def get_attack(self, other, memo=''): #피격 판정
-        if (other.atk_hitbox.memo):
+        if (memo == 'attack'):
             self.rigidity()
             self.hp -= (self.arm - other.atk)
             if other.cri <= random.random():
@@ -211,6 +213,9 @@ class Character(Human):
             pass
 
     def rigidity(self): #경직
+        self.act = 'stun'
+        self.actframe = 60
+        self.atk_hitbox.check = False
         if (self.viewdir == Vleft):
             self.sprite = self.get_attack_left_sprite
         elif (self.viewdir == Vright):
@@ -219,6 +224,7 @@ class Character(Human):
             pass
 
     def slash(self):
+        self.atk_hitbox.check = True
         if (self.viewdir == Vleft):
             self.sprite = self.slash_left_sprite
         elif (self.viewdir == Vright):
@@ -230,6 +236,7 @@ class Character(Human):
         else:
             self.act = 'sting'
             self.actframe = 6
+            self.atk_hitbox.check = True
             self.sting_cooltime = self.default_sting_cooltime
             if (self.viewdir == Vleft):
                 self.sprite = self.sting_left_sprite
@@ -237,6 +244,8 @@ class Character(Human):
                 self.sprite = self.sting_right_sprite
 
     def dead(self): #사망
+        self.hitbox.check=False
+        self.atk_hitbox.check = False
         if self.hp == 0:
             if (self.viewdir == Vleft):
                 self.sprite = self.dead_left_sprite
@@ -252,6 +261,7 @@ class Character(Human):
     def update(self):
         self.hitbox.move(self.position)
         self.hitbox.resize(*self.sprite.get_size())
+        self.atk_hitbox.move(self.position)
         self.atk_hitbox.resize(*self.sprite.get_size())
         if(self.act != 'stop'):
             self.actframe -= 1
@@ -311,7 +321,8 @@ class Near_Enemy(Human): #근거리
         self.stop()
 
     def jump(self): #점프
-         if self.onGround:
+        self.atk_hitbox.check = False
+        if self.onGround:
             self.onGround = False
             self.speed.y = JUMP_SPEED
             if self.viewdir == Vright:
@@ -320,12 +331,15 @@ class Near_Enemy(Human): #근거리
                 self.sprite = self.static_left_sprite
 
     def left(self): #좌측 보기?
+        self.atk_hitbox.check = False
         self.viewdir = Vleft
 
     def right(self): #우측 보기?
+        self.atk_hitbox.check = False
         self.viewdir = Vright
 
     def walk(self): #보고 있는 방향으로 이동?
+        self.atk_hitbox.check = False
         if (self.viewdir == Vleft):
             self.position.x -= MOVE_SPEED
             self.sprite = self.walk_left_sprite
@@ -336,6 +350,7 @@ class Near_Enemy(Human): #근거리
             self.atk_hitbox.move(self.position)
 
     def stop(self):
+        self.atk_hitbox.check = False
         self.speed.x = 0
         if self.viewdir == Vright:
             self.sprite = self.static_right_sprite
@@ -343,7 +358,9 @@ class Near_Enemy(Human): #근거리
             self.sprite = self.static_left_sprite
 
     def near_ai(self, other): #이동 메서드 추가
-        
+        if(self.act != 'stop'):
+            return
+
         dist = self.position.x - other.position.x
         if -20 < dist < 20:
             if(random.random() < 0.5):
@@ -364,6 +381,7 @@ class Near_Enemy(Human): #근거리
         self.stop()
         '''
     def sting(self):
+        self.atk_hitbox.check = True
         if(self.sting_cooltime > 0):
             pass
         else:
@@ -374,6 +392,7 @@ class Near_Enemy(Human): #근거리
                 self.sprite = self.sting_right_sprite
 
     def slash(self):
+        self.atk_hitbox.check = True
         if (self.viewdir == Vleft):
             self.sprite = self.slash_left_sprite
         elif (self.viewdir == Vright):
@@ -381,7 +400,7 @@ class Near_Enemy(Human): #근거리
 
 
     def get_attack(self, other, memo=''):
-        if (other.atk_hitbox):
+        if (memo == 'attack'):
             self.rigidity()
             self.hp -= (self.arm - other.atk)
             if other.cri <= random.random():
@@ -390,6 +409,9 @@ class Near_Enemy(Human): #근거리
             pass
         
     def rigidity(self):
+        self.atk_hitbox.check = False
+        self.act = 'stun'
+        self.actframe = 60
         if (self.viewdir == Vleft):
             self.sprite = self.get_attack_left_sprite
         elif (self.viewdir == Vright):
@@ -398,6 +420,8 @@ class Near_Enemy(Human): #근거리
             pass
 
     def dead(self):
+        self.atk_hitbox.check = False
+        self.hitbox.check = False
         if self.hp == 0:
             if (self.viewdir == Vleft):
                 self.sprite = self.dead_left_sprite
@@ -412,8 +436,13 @@ class Near_Enemy(Human): #근거리
         self.sprite.image_update()
 
     def update(self):
+        if(self.act != 'stop'):
+            self.actframe -= 1
+            if(self.actframe <= 0):
+                self.act = 'stop'
         self.hitbox.move(self.position)
         self.hitbox.resize(*self.sprite.get_size())
+        self.atk_hitbox.move(self.position)
         self.atk_hitbox.resize(*self.sprite.get_size())
         self.sting_cooltime -= 1
         self.position += self.speed
