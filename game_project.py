@@ -134,8 +134,7 @@ class Character(Human):
         self.sprite = self.static_right_sprite
     
         self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), 'static')
-        self.atk_hitbox_sting = hitbox(self, self.position.x, self.position.y, 200, 160, 'sting')
-        self.atk_hitbox_slash = hitbox(self, self.position.x, self.position.y, 180, 160, 'slash')
+        self.atk_hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), 'attack')
         self.sting_cooltime = 0
         self.default_sting_cooltime = 30
 
@@ -193,8 +192,7 @@ class Character(Human):
             self.position.x += MOVE_SPEED
             self.sprite = self.walk_right_sprite
             self.hitbox.move(self.position)
-            self.atk_hitbox_slash.move(self.position)
-            self.atk_hitbox_sting.move(self.position)
+            self.atk_hitbox.move(self.position)
 
     def stop(self):
         self.speed.x = 0
@@ -204,7 +202,7 @@ class Character(Human):
             self.sprite = self.static_left_sprite
 
     def get_attack(self, other, memo=''): #피격 판정
-        if (other.hitbox.memo == 'slash' or other.hitbox.memo == 'sting'):
+        if (other.atk_hitbox.memo):
             self.rigidity()
             self.hp -= (self.arm - other.atk)
             if other.cri <= random.random():
@@ -254,6 +252,7 @@ class Character(Human):
     def update(self):
         self.hitbox.move(self.position)
         self.hitbox.resize(*self.sprite.get_size())
+        self.atk_hitbox.resize(*self.sprite.get_size())
         if(self.act != 'stop'):
             self.actframe -= 1
             if(self.actframe == 0):
@@ -272,7 +271,6 @@ class Character(Human):
             self.onGround = True
             self.position.y = GROUND_HEIGHT
             self.speed = vector(0, 0)
-
         
     def draw(self, surf):
         pygame.draw.rect(surf, (0,0,255), (self.hitbox.x, self.hitbox.y, self.hitbox.width, self.hitbox.height), 1)
@@ -309,8 +307,7 @@ class Near_Enemy(Human): #근거리
         self.sprite = self.static_right_sprite
 
         self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), 'static')
-        self.atk_hitbox_sting = hitbox(self, self.position.x, self.position.y, 200, 160, 'sting')
-        self.atk_hitbox_slash = hitbox(self, self.position.x, self.position.y, 180, 160, 'slash')
+        self.atk_hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), 'attack')
         self.stop()
 
     def jump(self): #점프
@@ -336,8 +333,7 @@ class Near_Enemy(Human): #근거리
             self.position.x += MOVE_SPEED
             self.sprite = self.walk_right_sprite
             self.hitbox.move(self.position)
-            self.atk_hitbox_slash.move(self.position)
-            self.atk_hitbox_sting.move(self.position)
+            self.atk_hitbox.move(self.position)
 
     def stop(self):
         self.speed.x = 0
@@ -385,7 +381,7 @@ class Near_Enemy(Human): #근거리
 
 
     def get_attack(self, other, memo=''):
-        if (other.hitbox.memo == 'sting' or other.hitbox.memo == 'slash'):
+        if (other.atk_hitbox):
             self.rigidity()
             self.hp -= (self.arm - other.atk)
             if other.cri <= random.random():
@@ -418,6 +414,7 @@ class Near_Enemy(Human): #근거리
     def update(self):
         self.hitbox.move(self.position)
         self.hitbox.resize(*self.sprite.get_size())
+        self.atk_hitbox.resize(*self.sprite.get_size())
         self.sting_cooltime -= 1
         self.position += self.speed
         if not self.onGround:
@@ -454,30 +451,6 @@ class Distance_Enemy(Human): #원거리
     def dead(self):
         pass
 
-class Projectile:
+class Projectile: #투사체
     def __init__(self):
         pass
-'''
-class Boss(Near_Enemy, Distance_Enemy): #다중상속 -> 근/원거리 공격 포함
-
-    def __init__(self):
-        super().__init__(hp = 2000, mp = 0, atk = 25, arm = 10, cri = 0) #상속 코드 질문 다시 하기!!
-
-    def slash(self, other):
-        pass
-
-    def sting(self, other):
-        pass
-
-    def get_attack(self, other):
-        pass
-
-    def rigidity(self):
-        pass
-
-    def boss_ai(self): #복잡해지면 근/원거리 ai로 나눌거다.
-        pass
-
-    def dead(self):
-        pass
-'''

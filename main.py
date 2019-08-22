@@ -34,15 +34,15 @@ enemy_1 = Near_Enemy()
 enemyHPbar = UI.Enemy_stat(enemy_1, (0, 180))
 painter.append(enemy_1)
 painter.append(enemyHPbar)
-
+'''
 enemy_2 = Near_Enemy(position=(550, GROUND_HEIGHT))
 enemy2HPbar = UI.Enemy_stat(enemy_2, (0, 180))
 painter.append(enemy_2)
 painter.append(enemy2HPbar)
-
+'''
 hitbox_layer = {'player':[player.hitbox],            'enemy':[enemy_1.hitbox],          'item': [],
-                'player_attack_sting':[player.atk_hitbox_sting], 'enemy_attack_sting':[enemy_1.atk_hitbox_sting], 'throwable':[],
-                'player_attack_slash':[player.atk_hitbox_slash], 'enemy_attack_slash':[enemy_1.atk_hitbox_slash]
+                'player_attack':[player.atk_hitbox], 'enemy_attack':[enemy_1.atk_hitbox
+                ], 'throwable':[]
                }
 
 WHITE = (255, 255, 255)
@@ -66,20 +66,20 @@ while running:
    
     player.control(pygame.key.get_pressed())
     player.update()
-
+    
     enemy_1.near_ai(player)
 
     enemy_1.update()
+    '''
     enemy_2.near_ai(player)
     enemy_2.update()
+    '''
     painter.image_update()
     painter.draw()
 
     collide_list_to_list(hitbox_layer['player'], hitbox_layer['enemy'])
-    collide_list_to_list(hitbox_layer['player_attack_sting'], hitbox_layer['enemy'])
-    collide_list_to_list(hitbox_layer['player_attack_slash'], hitbox_layer['enemy'])
-    collide_list_to_list(hitbox_layer['player'], hitbox_layer['enemy_attack_sting'])
-    collide_list_to_list(hitbox_layer['player'], hitbox_layer['enemy_attack_slash'])
+    collide_list_to_list(hitbox_layer['player_attack'], hitbox_layer['enemy'])
+    collide_list_to_list(hitbox_layer['player'], hitbox_layer['enemy_attack'])
 
     
     fps = clock.get_fps()
