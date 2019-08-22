@@ -202,7 +202,7 @@ class Character(Human):
             self.sprite = self.static_left_sprite
 
     def get_attack(self, other, memo=''): #피격 판정
-        if (other.atk_hitbox.memo):
+        if (memo == 'attack'):
             self.rigidity()
             self.hp -= (self.arm - other.atk)
             if other.cri <= random.random():
@@ -213,8 +213,10 @@ class Character(Human):
     def rigidity(self): #경직
         if (self.viewdir == Vleft):
             self.sprite = self.get_attack_left_sprite
+            self.position -= (20, 0)
         elif (self.viewdir == Vright):
             self.sprite = self.get_attack_right_sprite
+            self.position += (20, 0)
         else:
             pass
 
@@ -360,6 +362,7 @@ class Near_Enemy(Human): #근거리
         else:
             self.right()
             self.walk()
+        
         '''
         self.stop()
         '''
@@ -381,19 +384,23 @@ class Near_Enemy(Human): #근거리
 
 
     def get_attack(self, other, memo=''):
-        if (other.atk_hitbox):
+        if (memo == 'attack'):
             self.rigidity()
             self.hp -= (self.arm - other.atk)
             if other.cri <= random.random():
                 self.hp -= (self.arm - other.atk * 2)
+
         else:
             pass
         
     def rigidity(self):
+        
         if (self.viewdir == Vleft):
             self.sprite = self.get_attack_left_sprite
+            self.position -= (20, 0)
         elif (self.viewdir == Vright):
             self.sprite = self.get_attack_right_sprite
+            self.position += (20, 0)
         else:
             pass
 
