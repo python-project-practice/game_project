@@ -25,6 +25,7 @@ import draw
 from collision import hitbox
 from vector import vector
 import time
+import UI
 
 #++ 히트박스 클래스 고려하여 프로그래밍 ㄱㄱ
 
@@ -131,15 +132,11 @@ class Character(Human):
         self.dead_right_sprite = draw.sprite(['image/char/get_attack_3.png'], True, 2, self.position)
         self.dead_left_sprite = self.dead_right_sprite.flip(True, False)
 
-
         self.sprite = self.static_right_sprite
-        self.sprite = self.slash_right_sprite
-        self.sprite = self.sting_right_sprite
-        self.sprite = self.get_attack_right_sprite
-        self.sprite = self.dead_right_sprite
-
-        self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size())
-        self.atk_hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), False)
+    
+        self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), 'static')
+        self.atk_hitbox_sting = hitbox(self, self.position.x, self.position.y, 200, 160, 'sting')
+        self.atk_hitbox_slash = hitbox(self, self.position.x, self.position.y, 180, 160, 'slash')
         self.stop() #stop 상태로 초기화
         
     def control(self, keys): #기본적인 조작법
@@ -155,17 +152,17 @@ class Character(Human):
             self.stop()
             if keys[K_z]:
                 self.slash()
-
+            elif keys[K_x]:
+                self.sting()
 
         if keys[K_UP] and self.onGround:
             self.jump()
-
-        if keys[K_x]:
-            self.sting()
-        
         
         else:
             pass
+
+        if keys[K_ESCAPE]:
+            pygame.quit()
 
     def jump(self): #점프
         if self.onGround:
@@ -189,7 +186,9 @@ class Character(Human):
         elif (self.viewdir == Vright):
             self.position.x += MOVE_SPEED
             self.sprite = self.walk_right_sprite
-        self.hitbox.move(self.position)
+            self.hitbox.move(self.position)
+            self.atk_hitbox_slash.move(self.position)
+            self.atk_hitbox_sting.move(self.position)
 
     def stop(self):
         self.speed.x = 0
@@ -199,28 +198,33 @@ class Character(Human):
             self.sprite = self.static_left_sprite
 
     def get_attack(self, other, memo=''): #피격 판정
-        self.hp -= 1
+        if (other.hitbox.memo == 'slash' or other.hitbox.memo == 'sting'):
+            self.rigidity()
+            self.hp -= (self.arm - other.atk)
+            if other.cri <= random.random():
+                self.hp -= (self.arm - other.atk * 2)
+        else:
+            pass
 
     def rigidity(self): #경직
-        pass
+        if (self.viewdir == Vleft):
+            self.sprite = self.get_attack_left_sprite
+        elif (self.viewdir == Vright):
+            self.sprite = self.get_attack_right_sprite
+        else:
+            pass
 
     def slash(self):
         if (self.viewdir == Vleft):
             self.sprite = self.slash_left_sprite
         elif (self.viewdir == Vright):
             self.sprite = self.slash_right_sprite
-        self.hp - (self.arm - self.atk) #적의 공격력을 끌어다 쓰는것은 고려해봐야 할듯
-        if (self.cri <= random.random()):
-            self.hp - (self.arm - self.atk * 2)
         
     def sting(self):
         if (self.viewdir == Vleft):
             self.sprite = self.sting_left_sprite
         elif (self.viewdir == Vright):
             self.sprite = self.sting_right_sprite
-        self.hp - (self.arm - self.atk)
-        if (self.cri <= random.random()):
-            self.hp - (self.arm - self.atk * 2)
 
     def dead(self): #사망
         if self.hp == 0:
@@ -236,6 +240,8 @@ class Character(Human):
         self.sprite.image_update()
 
     def update(self):
+        self.hitbox.move(self.position)
+        self.hitbox.resize(*self.sprite.get_size())
         self.position += self.speed
         if(self.position.x < MAP_LEFT_LIMIT): #self.position.left < MAP_LEFT_LIMIT
             self.position.x = MAP_LEFT_LIMIT
@@ -248,11 +254,11 @@ class Character(Human):
             self.onGround = True
             self.position.y = GROUND_HEIGHT
             self.speed = vector(0, 0)
+
         
     def draw(self, surf):
+        pygame.draw.rect(surf, (0,0,255), (self.hitbox.x, self.hitbox.y, self.hitbox.width, self.hitbox.height), 1)
         self.sprite.draw(surf)
-            
-
 
 class Near_Enemy(Human): #근거리
 
@@ -265,7 +271,10 @@ class Near_Enemy(Human): #근거리
         self.viewdir = Vright #오른쪽
         self.onGround = True #캐릭터가 땅 위에 존재
 
-        self.cooltime = 30 #쿨타임
+        self.cooltime_1 = 1 #쿨타임 책정
+        self.cooltime_2 = 1
+        self.last_sting = pygame.time.get_ticks()
+        self.last_slash = pygame.time.get_ticks()
 
         self.static_right_sprite = draw.sprite(['image/char/static.png'], True, 1, self.position)
         self.static_left_sprite = self.static_right_sprite.flip(True, False) #좌우 대칭
@@ -283,8 +292,9 @@ class Near_Enemy(Human): #근거리
 
         self.sprite = self.static_right_sprite
 
-        self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size())
-        self.atk_hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), False)
+        self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), 'static')
+        self.atk_hitbox_sting = hitbox(self, self.position.x, self.position.y, 200, 160, 'sting')
+        self.atk_hitbox_slash = hitbox(self, self.position.x, self.position.y, 180, 160, 'slash')
         self.stop()
 
     def jump(self): #점프
@@ -310,6 +320,8 @@ class Near_Enemy(Human): #근거리
             self.position.x += MOVE_SPEED
             self.sprite = self.walk_right_sprite
             self.hitbox.move(self.position)
+            self.atk_hitbox_slash.move(self.position)
+            self.atk_hitbox_sting.move(self.position)
 
     def stop(self):
         self.speed.x = 0
@@ -319,46 +331,71 @@ class Near_Enemy(Human): #근거리
             self.sprite = self.static_left_sprite
 
     def near_ai(self, other): #이동 메서드 추가
+        
         dist = self.position.x - other.position.x
-        if -40 < dist < 40:
+        if -20 < dist < 20:
             if(random.random() < 0.5):
                 self.slash()
             else:
                 self.slash()
-        elif -100 < dist < 100:
+        elif -70 < dist < 70:
             self.stop()
             self.sting()
-        elif dist > 100:
+        elif dist > 70:
             self.left()
             self.walk()
         else:
             self.right()
             self.walk()
-
+        '''
+        self.stop()
+        '''
     def sting(self):
-        if (self.viewdir == Vleft):
-            self.sprite = self.sting_left_sprite
-        elif (self.viewdir == Vright):
+        now_1 = pygame.time.get_ticks()
+        if (now_1 - self.last_sting <= self.cooltime_1 * 1000):
+            pass
+        else:
+            self.last_sting = now_1
             self.sprite = self.sting_right_sprite
-        self.hp - (self.arm - self.atk) #적의 공격력을 끌어다 쓰는것은 고려해봐야 할듯
-        if (self.cri <= random.random()):
-            self.hp - (self.arm - self.atk * 2)
+
+            if (self.viewdir == Vleft):
+                self.sprite = self.sting_left_sprite
+            elif (self.viewdir == Vright):
+                self.sprite = self.sting_right_sprite
 
     def slash(self):
+        if self.last_sting:
+            now_2 = self.last_sting
+            if (now_2 - self.last_slash <= self.cooltime_2 * 1000):
+                pass
+            else:
+                self.sprite = self.slash_right_sprite
+
+        else:
+            pass
+
         if (self.viewdir == Vleft):
             self.sprite = self.slash_left_sprite
         elif (self.viewdir == Vright):
             self.sprite = self.slash_right_sprite
-        self.hp - (self.arm - self.atk) #적의 공격력을 끌어다 쓰는것은 고려해봐야 할듯
-        if (self.cri <= random.random()):
-            self.hp - (self.arm - self.atk * 2)
-        
+
 
     def get_attack(self, other, memo=''):
-        pass
-
+        if (other.hitbox.memo == 'sting' or other.hitbox.memo == 'slash'):
+            self.rigidity()
+            self.hp -= (self.arm - other.atk)
+            if other.cri <= random.random():
+                self.hp -= (self.arm - other.atk * 2)
+        else:
+            pass
+        
     def rigidity(self):
-        pass
+        if (self.viewdir == Vleft):
+            self.sprite = self.get_attack_left_sprite
+        elif (self.viewdir == Vright):
+            self.sprite = self.get_attack_right_sprite
+        else:
+            pass
 
     def dead(self):
         if self.hp == 0:
@@ -375,16 +412,21 @@ class Near_Enemy(Human): #근거리
         self.sprite.image_update()
 
     def update(self):
+        self.hitbox.move(self.position)
+        self.hitbox.resize(*self.sprite.get_size())
         self.position += self.speed
-
         if not self.onGround:
             self.speed += GRAVITY_CONSTANT
         if(self.position.y > GROUND_HEIGHT):
             self.onGround = True
             self.position.y = GROUND_HEIGHT
             self.speed = vector(0, 0)
-        
+
+        if self.hp == 0:
+            self.dead()
+
     def draw(self, surf):
+        pygame.draw.rect(surf, (255,0,0), (self.hitbox.x, self.hitbox.y, self.hitbox.width, self.hitbox.height), 1)
         self.sprite.draw(surf)
 
 class Distance_Enemy(Human): #원거리

@@ -24,6 +24,7 @@ painter = draw.painter(DISP)
 painter.append_bg('image/MapSunny.png')
 
 
+
 player = Character()
 playerHPbar = UI.Character_stat(player, (5, 5))
 painter.append(player)
@@ -35,7 +36,8 @@ painter.append(enemy_1)
 painter.append(enemyHPbar)
 
 hitbox_layer = {'player':[player.hitbox],            'enemy':[enemy_1.hitbox],          'item': [],
-                'player_attack':[player.atk_hitbox], 'enemy_attack':[enemy_1.atk_hitbox], 'throwable':[]
+                'player_attack_sting':[player.atk_hitbox_sting], 'enemy_attack_sting':[enemy_1.atk_hitbox_sting], 'throwable':[],
+                'player_attack_slash':[player.atk_hitbox_slash], 'enemy_attack_slash':[enemy_1.atk_hitbox_slash]
                }
 # 일단은 임시로 만들어두었음.
 # 매 프레임이 끝날 때 쯤 어디에 collision 모듈을 이용해서 충돌처리를 할 생각이다.
@@ -69,12 +71,18 @@ while running:
    
     player.control(pygame.key.get_pressed())
     player.update()
+
     enemy_1.near_ai(player)
+
     enemy_1.update()
     painter.image_update()
     painter.draw()
 
     collide_list_to_list(hitbox_layer['player'], hitbox_layer['enemy'])
+    collide_list_to_list(hitbox_layer['player_attack_sting'], hitbox_layer['enemy'])
+    collide_list_to_list(hitbox_layer['player_attack_slash'], hitbox_layer['enemy'])
+    collide_list_to_list(hitbox_layer['player'], hitbox_layer['enemy_attack_sting'])
+    collide_list_to_list(hitbox_layer['player'], hitbox_layer['enemy_attack_slash'])
 
     #pygame.draw.rect(DISP, WHITE, [0, 0, 400, 75])
     #if frame < 150: 
@@ -88,4 +96,3 @@ while running:
     pygame.display.update()
 
     frame += 1
-    
