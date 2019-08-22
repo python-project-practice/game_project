@@ -218,8 +218,10 @@ class Character(Human):
         self.atk_hitbox.check = False
         if (self.viewdir == Vleft):
             self.sprite = self.get_attack_left_sprite
+            self.position -= (20, 0)
         elif (self.viewdir == Vright):
             self.sprite = self.get_attack_right_sprite
+            self.position += (20, 0)
         else:
             pass
 
@@ -377,6 +379,7 @@ class Near_Enemy(Human): #근거리
         else:
             self.right()
             self.walk()
+        
         '''
         self.stop()
         '''
@@ -405,6 +408,7 @@ class Near_Enemy(Human): #근거리
             self.hp -= (self.arm - other.atk)
             if other.cri <= random.random():
                 self.hp -= (self.arm - other.atk * 2)
+
         else:
             pass
         
