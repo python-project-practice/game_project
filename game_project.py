@@ -109,7 +109,7 @@ class Human(metaclass=ABCMeta):
         pass
 
 class Character(Human):
-    def __init__(self, hp = 150, mp = 20, atk = 30, arm = 10, cri = 0.1): #기본 스텟/몹, 캐릭터의 위치 설계
+    def __init__(self, hp = 150, mp = 20, atk = 10, arm = 10, cri = 0.1): #기본 스텟/몹, 캐릭터의 위치 설계
         super().__init__(hp, mp, atk, arm, cri)  
         self.position = vector(60, GROUND_HEIGHT)
         self.speed = vector(0, 0) #속도. 매 프레임마다 위치+= 속도
@@ -137,6 +137,8 @@ class Character(Human):
         self.atk_hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), 'attack')
         self.sting_cooltime = 0
         self.default_sting_cooltime = 30
+        self.slash_cooltime = 0
+        self.default_slash_cooltime = 30
 
         self.stop() #stop 상태로 초기화
         
@@ -209,7 +211,8 @@ class Character(Human):
             self.hp -= (other.atk - self.arm)
             if other.cri <= random.random():
                 self.hp -= (other.atk * 2 - self.arm)
-                            if(self.hp <= 0):
+
+            if(self.hp <= 0):
                 self.dead()
         else:
             pass
@@ -220,17 +223,25 @@ class Character(Human):
         self.atk_hitbox.check = False
         if (self.viewdir == Vleft):
             self.sprite = self.get_attack_left_sprite
+            self.position.x += 40
         elif (self.viewdir == Vright):
             self.sprite = self.get_attack_right_sprite
+            self.position.x -= 40
         else:
             pass
 
     def slash(self):
-        self.atk_hitbox.check = True
-        if (self.viewdir == Vleft):
-            self.sprite = self.slash_left_sprite
-        elif (self.viewdir == Vright):
-            self.sprite = self.slash_right_sprite
+        if (self.slash_cooltime > 0):
+            pass
+        else:
+            self.act = 'slash'
+            self.actframe = 10
+            self.atk_hitbox.check = True
+            self.slash_cooltime = self.default_slash_cooltime
+            if (self.viewdir == Vleft):
+                self.sprite = self.slash_left_sprite
+            elif (self.viewdir == Vright):
+                self.sprite = self.slash_right_sprite
         
     def sting(self):
         if (self.sting_cooltime > 0):
@@ -246,6 +257,8 @@ class Character(Human):
                 self.sprite = self.sting_right_sprite
 
     def dead(self): #사망
+        self.act = 'dead'
+        self.actframe = 10000
         self.hitbox.check=False
         self.atk_hitbox.check = False
         if self.hp <= 0:
@@ -283,6 +296,7 @@ class Character(Human):
             self.onGround = True
             self.position.y = GROUND_HEIGHT
             self.speed = vector(0, 0)
+
         
     def draw(self, surf):
         pygame.draw.rect(surf, (0,0,255), (self.hitbox.x, self.hitbox.y, self.hitbox.width, self.hitbox.height), 1)
@@ -300,7 +314,9 @@ class Near_Enemy(Human): #근거리
         self.onGround = True #캐릭터가 땅 위에 존재
 
         self.sting_cooltime = 0
-        self.default_sting_cooltime = 30
+        self.default_sting_cooltime = 60
+        self.slash_cooltime = 0
+        self.default_slash_cooltime = 20
 
         self.static_right_sprite = draw.sprite(['image/char/static.png'], True, 1, self.position)
         self.static_left_sprite = self.static_right_sprite.flip(True, False) #좌우 대칭
@@ -361,7 +377,7 @@ class Near_Enemy(Human): #근거리
 
     def near_ai(self, other): #이동 메서드 추가
         if(self.act != 'stop'):
-            return
+            pass
 
         dist = self.position.x - other.position.x
         if -20 < dist < 20:
@@ -380,14 +396,13 @@ class Near_Enemy(Human): #근거리
             self.right()
             self.walk()
         
-        '''
-        self.stop()
-        '''
     def sting(self):
         self.atk_hitbox.check = True
-        if(self.sting_cooltime > 0):
+        if (self.sting_cooltime > 0):
             pass
         else:
+            self.act = 'sting'
+            self.actframe = 6
             self.sting_cooltime = self.default_sting_cooltime
             if (self.viewdir == Vleft):
                 self.sprite = self.sting_left_sprite
@@ -396,10 +411,16 @@ class Near_Enemy(Human): #근거리
 
     def slash(self):
         self.atk_hitbox.check = True
-        if (self.viewdir == Vleft):
-            self.sprite = self.slash_left_sprite
-        elif (self.viewdir == Vright):
-            self.sprite = self.slash_right_sprite
+        if (self.slash_cooltime > 0):
+            pass
+        else:
+            self.act = 'slash'
+            self.actframe = 6
+            self.slash_cooltime = self.default_slash_cooltime
+            if (self.viewdir == Vleft):
+                self.sprite = self.slash_left_sprite
+            elif (self.viewdir == Vright):
+                self.sprite = self.slash_right_sprite
 
 
     def get_attack(self, other, memo=''):
@@ -419,12 +440,16 @@ class Near_Enemy(Human): #근거리
         self.actframe = 10
         if (self.viewdir == Vleft):
             self.sprite = self.get_attack_left_sprite
+            self.position.x += 40
         elif (self.viewdir == Vright):
             self.sprite = self.get_attack_right_sprite
+            self.position.x -= 40
         else:
             pass
 
     def dead(self):
+        self.act = 'dead'
+        self.actframe = 100000
         self.atk_hitbox.check = False
         self.hitbox.check = False
         if self.hp <= 0:
@@ -432,7 +457,6 @@ class Near_Enemy(Human): #근거리
                 self.sprite = self.dead_left_sprite
             elif (self.viewdir == Vright):
                 self.sprite = self.dead_right_sprite
-            self.sprite = None #캐릭터 사망시 객체 / 이미지 삭제
         else:
             pass
 

@@ -3,7 +3,7 @@
 import pygame
 from vector import vector
 
-class image():
+class image:
     '''
     image(file, alpha=False, pos=(0,0), adjust_pos=(0,0))
         file = filename, image or surface

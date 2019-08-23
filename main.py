@@ -19,7 +19,7 @@ WIDTH, HEIGHT = 800, 600
 
 pygame.init()
 DISP = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("연습")
+pygame.display.set_caption("액션 게임")
 painter = draw.painter(DISP)
 painter.append_bg('image/MapSunny.png')
 
@@ -42,8 +42,7 @@ painter.append(enemy_2)
 painter.append(enemy2HPbar)
 '''
 hitbox_layer = {'player':[player.hitbox],            'enemy':[enemy_1.hitbox],          'item': [],
-                'player_attack':[player.atk_hitbox], 'enemy_attack':[enemy_1.atk_hitbox
-                ], 'throwable':[]
+                'player_attack':[player.atk_hitbox], 'enemy_attack':[enemy_1.atk_hitbox], 'throwable':[]
                }
 
 WHITE = (255, 255, 255)
@@ -58,6 +57,14 @@ clock = pygame.time.Clock()
 gulim = pygame.font.SysFont('Gulim', 36)
 running = True
 
+gulim_dead = pygame.font.SysFont('Gulim', 70)
+gulim_choose = pygame.font.SysFont('Gulim', 50)
+retry = gulim_dead.render('Retry?', 1, BLACK)
+choose = gulim_choose.render('Y / N', 1, BLACK)
+retryrect = retry.get_rect()
+chooserect = choose.get_rect()
+retryrect.center = (WIDTH / 2, HEIGHT / 4)
+chooserect.center = (WIDTH / 2 , HEIGHT * (35 / 100))
 
 while running:
     clock.tick(60)
@@ -83,6 +90,9 @@ while running:
     collide_list_to_list(hitbox_layer['player_attack'], hitbox_layer['enemy'])
     collide_list_to_list(hitbox_layer['player'], hitbox_layer['enemy_attack'])
 
+    if player.hp == 0:
+        DISP.blit(retry, retryrect)
+        DISP.blit(choose, chooserect)
     
     fps = clock.get_fps()
     fpsmsg = gulim.render('fps: ' + str(int(fps)), 1, BLACK, WHITE)
