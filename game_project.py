@@ -62,7 +62,7 @@ class Human(metaclass=ABCMeta):
         self.onGround = True #캐릭터가 땅 위에 존재
 
     def __str__(self):
-        return __name__ + " at (" + str(self.position) + ")"
+        return __name__ + " at (" + str(self.position) + ")" ##??
 
     @abstractmethod 
     def jump(self): #점프
