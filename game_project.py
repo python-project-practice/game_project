@@ -320,18 +320,18 @@ class Near_Enemy(Human): #근거리
         self.slash_cooltime = 0
         self.default_slash_cooltime = 20
 
-        self.static_right_sprite = draw.sprite(['image/char/static.png'], True, 1, self.position)
+        self.static_right_sprite = draw.sprite(['image/Enemy/static.png'], True, 1, self.position)
         self.static_left_sprite = self.static_right_sprite.flip(True, False) #좌우 대칭
-        self.walk_right_sprite = draw.sprite(['image/char/walk-' + str(i) + '.png' for i in range(1,5)], True, 6, self.position)
+        self.walk_right_sprite = draw.sprite(['image/Enemy/walk-' + str(i) + '.png' for i in range(1,5)], True, 6, self.position)
         self.walk_left_sprite = self.walk_right_sprite.flip(True, False)
-        self.slash_right_sprite = draw.sprite(['image/char/slash_' + str(i) + '.png' for i in range(1,3)], True, 2, self.position)
+        self.slash_right_sprite = draw.sprite(['image/Enemy/slash_' + str(i) + '.png' for i in range(1,3)], True, 2, self.position)
         self.slash_left_sprite = self.slash_right_sprite.flip(True, False)
-        self.sting_right_sprite = draw.sprite(['image/char/sting_' + str(i) + '.png' for i in range(1,3)], True, 2, self.position)
+        self.sting_right_sprite = draw.sprite(['image/Enemy/sting_' + str(i) + '.png' for i in range(1,3)], True, 2, self.position)
         self.sting_left_sprite = self.sting_right_sprite.flip(True, False)
-        self.get_attack_right_sprite = draw.sprite(['image/char/get_attack_1.png'], True, 3, self.position)
+        self.get_attack_right_sprite = draw.sprite(['image/Enemy/get_attack_1.png'], True, 3, self.position)
         self.get_attack_left_sprite = self.get_attack_right_sprite.flip(True, False)
 
-        self.dead_right_sprite = draw.sprite(['image/char/get_attack_3.png'], True, 2, self.position)
+        self.dead_right_sprite = draw.sprite(['image/Enemy/get_attack_3.png'], True, 2, self.position)
         self.dead_left_sprite = self.dead_right_sprite.flip(True, False)
 
         self.sprite = self.static_right_sprite
