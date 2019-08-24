@@ -83,7 +83,7 @@ class Human(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def stop(self): #멈춤/땅 위에 존재
+    def stop(self): #멈춤
         pass
 
     @abstractmethod
@@ -493,21 +493,51 @@ class Distance_Enemy(Human): #원거리
     def __init__(self):
        super().__init__(hp = 250, mp = 0, atk = 15, arm = 5, cri = 0)
 
+    def jump(self): #점프
+        pass
+
+    def left(self): #좌측 방향
+        pass
+
+    def right(self): #우측 방향
+        pass
+
+    def walk(self): # 이동
+        pass
+
+    def stop(self): #멈춤
+        pass
+
     def shoot(self ,other):
         pass
 
-    def get_attack(self, other):
+    def get_attack(self, other, memo=''): #피격 판정. other:Human에게 (memo:str)형태로
         pass
 
-    def rigidity(self, other):
+    def rigidity(self): #경직
         pass
 
     def distance_ai(self, other): #모션은 기존의 찌르기/베기 모션을 오버라이딩함.
         pass
 
-    def dead(self):
+    def dead(self): #사망
+        pass
+
+    def distance_ai(self, other):#
+        pass
+
+    def update(self): #캐릭터 상태 업데이트: 캐릭터의 스텟이나 위치 등 상태만 업데이트 한다. 내부에서 이미지 업데이트를 부르지 말자.
+        pass
+
+    def image_update(self): # 캐릭터 이미지 업데이트: 스프라이트 이미지만 업데이트 한다. 내부에서 상태 업데이트를 부르지 말자.
         pass
 
 class Projectile: #투사체
     def __init__(self):
-        pass
+        self.sprite = None
+
+        self.position = None
+        self.speed = None
+
+        self.damage = None
+        self.getGravity = False

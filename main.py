@@ -38,8 +38,6 @@ gulim_dead = pygame.font.SysFont('Gulim', 70)
 gulim_choose = pygame.font.SysFont('Gulim', 50)
 
 running = True  #프로그램을 계속 돌릴 것인지 여부
-playing = True  #게임이 계속 실행중인지 여부
-gameover = False#게임 오버가 돼서 새 게임을 시작해야 하는지 여부
 
 retry = gulim_dead.render('Retry?', 1, BLACK)
 choose = gulim_choose.render('Y / N', 1, BLACK)
@@ -62,6 +60,7 @@ while running: #프로그램 전체를 담당하는 반복문.
     #units(Dict)->enemy(list)->nearenemySet->Near_Enemy
     #                                       ->UI
     #           ->items(list)->itemSet(아직까진 아이템을 쓸 지도 미확정이지만.)
+
     player = unit.characterSet(Character()) #캐릭터와 그 캐릭터에 해당하는 인터페이스까지 한번에 생성한다.
     player.character.draw_hitbox = True
     player.character.hitbox.debugColor = (0, 0, 255)
@@ -91,7 +90,9 @@ while running: #프로그램 전체를 담당하는 반복문.
                     'throwable':    []
                     }
 
-    playing = True
+    playing = True  #게임이 계속 실행중인지 여부
+    gameover = False#게임 오버가 돼서 새 게임을 시작해야 하는지 여부
+    win = False     #게임을 이겨서 승리 화면을 봐야 하는지 여부
 
 ############################################################################################
 #실제 게임을 시작한다.
@@ -117,9 +118,19 @@ while running: #프로그램 전체를 담당하는 반복문.
         painter.draw()
 
 
-        if player.character.hp <= 0:
+        if player.character.hp <= 0: #게임오버. 내가 죽으면서 적을 모두 죽였어도 게임오버(승리x).
             playing = False
             gameover = True
+            win = False
+
+        else:
+            for i in units['enemy']: 
+                if i.character.act != 'dead':
+                    break
+            #적이 모두 죽었고 나는 살았으면 승리
+            playing = False
+            gameover = False
+            win = True
     
         fps = clock.get_fps()
         fpsmsg = gulim.render('fps: ' + str(int(fps)), 1, BLACK, WHITE)
@@ -144,6 +155,11 @@ while running: #프로그램 전체를 담당하는 반복문.
                     gameover = False
                     running = False
         pygame.display.update()
+################################################################################################
+#승리했을 경우에는 이 쪽으로 온다.
+################################################################################################
+while win:
+    break
 ################################################################################################
 #사용했던 것들을 날린다.
 ################################################################################################
