@@ -1,9 +1,22 @@
 """draw image or sprite using pygame."""
 
+from abc import *
 import pygame
 from vector import vector
 
-class image:
+class drawable(metaclass=ABCMeta): #painter에 등록할 수 있음을 명시적으로 표시. draw와 image_update가 있다.
+    def __init__(self):
+        pass
+
+    @abstractmethod
+    def draw(self):
+        pass
+
+    @abstractmethod
+    def image_update(self):
+        pass
+
+class image(drawable):
     '''
     image(file, alpha=False, pos=(0,0), adjust_pos=(0,0))
         file = filename, image or surface
@@ -67,7 +80,7 @@ class image:
         # do absolutely nothing
         pass
 
-class sprite:
+class sprite(drawable):
     def __init__(self, imagenamelist = [], alpha=False, update_period = 1, pos=(0,0), adjust_pos = []):
         self.imagelist = [image(i, alpha, pos) for i in imagenamelist]
         self.pos = vector(*pos)
@@ -125,7 +138,9 @@ class painter:
         self.__updatelist.append(bg)
 
     def append(self, item):
-        assert 'draw' in dir(item)
+        if not isinstance(item, drawable): # drawable에서 상속받은 것들만 등록한다. draw, image_update가 반드시 있음을 명시.
+            raise TypeError(str(item) + ' is not drawable')
+                                          # 그렇지 않으면 TypeError가 발생한다.
         self.__updatelist.append(item)
 
     def draw(self):

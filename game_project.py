@@ -60,6 +60,7 @@ class Human(metaclass=ABCMeta):
         self.act = 'stop' #여러 프레임이 걸리는 행동이 있을 거 아냐 그럴 때 지금 무슨 행동을 실행하고 있는지
         self.actframe = 0 # 여러 프레임이 걸리는 행동일 경우 몇 프레임 후에 행동이 끝나는지
         self.onGround = True #캐릭터가 땅 위에 존재
+        self.draw_hitbox = False
 
     def __str__(self):
         return str(self.__class__)#__class__은 클래스 이름을 str 형태로 가져온다.
@@ -106,8 +107,9 @@ class Human(metaclass=ABCMeta):
         pass
 
     def draw(self, surf): #캐릭터/몹 상태를 나타냄
-        self.hitbox.draw(surf)
-        self.atk_hitbox.draw(surf)
+        if(self.draw_hitbox):
+            self.hitbox.draw(surf)
+            self.atk_hitbox.draw(surf)
         self.sprite.draw(surf)
 
 class Character(Human):
@@ -142,6 +144,8 @@ class Character(Human):
         self.slash_cooltime = 0
         self.default_slash_cooltime = 30
 
+        self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), memo="body")
+        self.atk_hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), memo="attack", check=False)
         self.stop() #stop 상태로 초기화
         
     def control(self, keys): #기본적인 조작법
