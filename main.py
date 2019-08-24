@@ -128,9 +128,9 @@ while running: #프로그램 전체를 담당하는 반복문.
                 if i.character.act != 'dead':
                     break
             #적이 모두 죽었고 나는 살았으면 승리
-            playing = False
-            gameover = False
-            win = True
+                playing = False
+                gameover = False
+                win = True
     
         fps = clock.get_fps()
         fpsmsg = gulim.render('fps: ' + str(int(fps)), 1, BLACK, WHITE)
