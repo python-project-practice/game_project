@@ -50,6 +50,39 @@ youwinrect.center = (WIDTH / 2, HEIGHT * 0.15)
 chooserect.center = (WIDTH / 2 , HEIGHT * (35 / 100))
 
 
+def gameoverEvent():
+    global running # 전역변수 running을 쓴다. 명시하지 않으면 메소드에 속한 임시변수 running을 만든다.
+    while True:
+        DISP.blit(retry, retryrect)
+        DISP.blit(choose, chooserect)
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                running = False
+            if event.type == KEYDOWN:
+                if event.key == K_y:
+                    return
+                if event.key == K_n:
+                    running = False
+                    return
+        pygame.display.update()
+
+def winEvent():
+    global running # 전역변수 running을 쓴다. 명시하지 않으면 메소드에 속한 임시변수 running을 만든다.
+    while True:
+        DISP.blit(youwin, youwinrect)
+        DISP.blit(retry, retryrect)
+        DISP.blit(choose, chooserect)
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                running = False
+            if event.type == KEYDOWN:
+                if event.key == K_y:
+                    return
+                if event.key == K_n:
+                    running = False
+                    return
+        pygame.display.update()
+
 while running: #프로그램 전체를 담당하는 반복문.
 #############################################################################################
 #한 게임마다 초기화해야 하는 것들을 담당한다. 플레이어나, 적이나 그런 것들.
@@ -94,8 +127,6 @@ while running: #프로그램 전체를 담당하는 반복문.
                     }
 
     playing = True  #게임이 계속 실행중인지 여부
-    gameover = False#게임 오버가 돼서 새 게임을 시작해야 하는지 여부
-    win = False     #게임을 이겨서 승리 화면을 봐야 하는지 여부
 
 ############################################################################################
 #실제 게임을 시작한다.
@@ -123,8 +154,7 @@ while running: #프로그램 전체를 담당하는 반복문.
 
         if player.character.hp <= 0: #게임오버. 내가 죽으면서 적을 모두 죽였어도 게임오버(승리x).
             playing = False
-            gameover = True
-            win = False
+            gameoverEvent()
 
         else:
             for i in units['enemy']: 
@@ -132,8 +162,7 @@ while running: #프로그램 전체를 담당하는 반복문.
                     break
             #적이 모두 죽었고 나는 살았으면 승리
                 playing = False
-                gameover = False
-                win = True
+                winEvent()
     
         fps = clock.get_fps()
         fpsmsg = gulim.render('fps: ' + str(int(fps)), 1, BLACK, WHITE)
@@ -143,41 +172,9 @@ while running: #프로그램 전체를 담당하는 반복문.
 
         frame += 1
 ################################################################################################
-#게임오버 후 재시작할 지 여부를 묻는다.
-################################################################################################
-    while gameover:
-        DISP.blit(retry, retryrect)
-        DISP.blit(choose, chooserect)
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                running = False
-            if event.type == KEYDOWN:
-                if event.key == K_y:
-                    gameover = False
-                if event.key == K_n:
-                    gameover = False
-                    running = False
-        pygame.display.update()
-################################################################################################
-#승리했을 경우에는 이 쪽으로 온다.
-################################################################################################
-    while win:
-        DISP.blit(youwin, youwinrect)
-        DISP.blit(retry, retryrect)
-        DISP.blit(choose, chooserect)
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                running = False
-            if event.type == KEYDOWN:
-                if event.key == K_y:
-                    win = False
-                if event.key == K_n:
-                    win = False
-                    running = False
-        pygame.display.update()
-################################################################################################
 #사용했던 것들을 날린다.
 ################################################################################################
+    print('running = ' + str(running))
     for item in units:
         del item
     del player
