@@ -6,6 +6,7 @@ class hitbox(pygame.Rect):
         self.parent = parent # 캐릭터 or 적을 가리킴
         self.memo = memo # parent가 여러 종류의 히트 박스를 가질 경우 히트박스끼리 구분하기 위해서
         self.check = check
+        self.debugColor = (255, 0, 0)
         
     def move(self, pos):
         self.left = pos[0]
@@ -20,6 +21,13 @@ class hitbox(pygame.Rect):
     
     def __str__(self):
         return self.__repr__()
+
+    def draw(self, surf):
+        gulim = pygame.font.SysFont('Gulim', 15)
+        name = gulim.render(str(self.parent), 1, self.debugColor)
+        namerect = name.get_rect()
+        surf.blit(name, (self.x + self.width / 2 - namerect.width / 2, self.y))
+        pygame.draw.rect(surf, self.debugColor, self, 1)
 
 
 def collide_list_to_list(list1, list2): #히트박스로 이루어진 리스트

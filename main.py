@@ -29,12 +29,15 @@ player = Character()
 playerHPbar = UI.Character_stat(player, (5, 5))
 painter.append(player)
 painter.append(playerHPbar)
-
+player.hitbox.debugColor = (0, 0, 255)
+player.atk_hitbox.debugColor = (0, 255, 255)
 
 enemy_1 = Near_Enemy()
 enemyHPbar = UI.Enemy_stat(enemy_1, (0, 180))
 painter.append(enemy_1)
 painter.append(enemyHPbar)
+enemy_1.hitbox.debugColor = (255, 0, 0)
+enemy_1.atk_hitbox.debugColor = (255, 255, 0)
 '''
 enemy_2 = Near_Enemy(position=(550, GROUND_HEIGHT))
 enemy2HPbar = UI.Enemy_stat(enemy_2, (0, 180))

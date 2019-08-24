@@ -62,7 +62,8 @@ class Human(metaclass=ABCMeta):
         self.onGround = True #캐릭터가 땅 위에 존재
 
     def __str__(self):
-        return __name__ + " at (" + str(self.position) + ")" ##??
+        return str(self.__class__)#__class__은 클래스 이름을 str 형태로 가져온다.
+                                  #이 메소드를 상속받은 클래스에서도 쓸 수 있다. 디버그용.
 
     @abstractmethod 
     def jump(self): #점프
@@ -104,9 +105,10 @@ class Human(metaclass=ABCMeta):
     def image_update(self): # 캐릭터 이미지 업데이트: 스프라이트 이미지만 업데이트 한다. 내부에서 상태 업데이트를 부르지 말자.
         pass
 
-    @abstractmethod
-    def draw(self): #캐릭터/몹 상태를 나타냄
-        pass
+    def draw(self, surf): #캐릭터/몹 상태를 나타냄
+        self.hitbox.draw(surf)
+        self.atk_hitbox.draw(surf)
+        self.sprite.draw(surf)
 
 class Character(Human):
     def __init__(self, hp = 150, mp = 20, atk = 10, arm = 10, cri = 0.1): #기본 스텟/몹, 캐릭터의 위치 설계
@@ -297,10 +299,6 @@ class Character(Human):
             self.position.y = GROUND_HEIGHT
             self.speed = vector(0, 0)
 
-        
-    def draw(self, surf):
-        pygame.draw.rect(surf, (0,0,255), (self.hitbox.x, self.hitbox.y, self.hitbox.width, self.hitbox.height), 1)
-        self.sprite.draw(surf)
 
 class Near_Enemy(Human): #근거리
 
@@ -485,9 +483,6 @@ class Near_Enemy(Human): #근거리
         if self.hp <= 0:
             self.dead()
 
-    def draw(self, surf):
-        pygame.draw.rect(surf, (255,0,0), (self.hitbox.x, self.hitbox.y, self.hitbox.width, self.hitbox.height), 1)
-        self.sprite.draw(surf)
 
 class Distance_Enemy(Human): #원거리
 
