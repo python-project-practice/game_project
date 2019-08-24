@@ -40,10 +40,13 @@ gulim_choose = pygame.font.SysFont('Gulim', 50)
 running = True  #프로그램을 계속 돌릴 것인지 여부
 
 retry = gulim_dead.render('Retry?', 1, BLACK)
+youwin = gulim_dead.render('You Win!', 1, BLACK)
 choose = gulim_choose.render('Y / N', 1, BLACK)
 retryrect = retry.get_rect()
+youwinrect = youwin.get_rect()
 chooserect = choose.get_rect()
 retryrect.center = (WIDTH / 2, HEIGHT / 4)
+youwinrect.center = (WIDTH / 2, HEIGHT * 0.15)
 chooserect.center = (WIDTH / 2 , HEIGHT * (35 / 100))
 
 
@@ -158,8 +161,20 @@ while running: #프로그램 전체를 담당하는 반복문.
 ################################################################################################
 #승리했을 경우에는 이 쪽으로 온다.
 ################################################################################################
-while win:
-    break
+    while win:
+        DISP.blit(youwin, youwinrect)
+        DISP.blit(retry, retryrect)
+        DISP.blit(choose, chooserect)
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                running = False
+            if event.type == KEYDOWN:
+                if event.key == K_y:
+                    win = False
+                if event.key == K_n:
+                    win = False
+                    running = False
+        pygame.display.update()
 ################################################################################################
 #사용했던 것들을 날린다.
 ################################################################################################
