@@ -379,7 +379,7 @@ class Near_Enemy(Human): #근거리
 
     def near_ai(self, other): #이동 메서드 추가
         if(self.act != 'stop'):
-            pass
+            return #다른 동작중이면 아무 것도 하지 않는다
 
         dist = self.position.x - other.position.x
         if -20 < dist < 20:
@@ -451,7 +451,7 @@ class Near_Enemy(Human): #근거리
 
     def dead(self):
         self.act = 'dead'
-        self.actframe = 100000
+        self.actframe = -1 # 1씩 감소하면 0이 될 일은 없으니까?? 테스트
         self.atk_hitbox.check = False
         self.hitbox.check = False
         if self.hp <= 0:
@@ -469,7 +469,7 @@ class Near_Enemy(Human): #근거리
     def update(self):
         if(self.act != 'stop'):
             self.actframe -= 1
-            if(self.actframe <= 0):
+            if(self.actframe == 0):
                 self.act = 'stop'
         self.hitbox.move(self.position)
         self.hitbox.resize(*self.sprite.get_size())
