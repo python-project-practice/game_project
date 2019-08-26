@@ -197,6 +197,8 @@ class Character(Human):
         if (self.viewdir == Vleft):
             self.position.x -= MOVE_SPEED
             self.sprite = self.walk_left_sprite
+            self.hitbox.move(self.position)
+            self.atk_hitbox.check = False
         elif (self.viewdir == Vright):
             self.position.x += MOVE_SPEED
             self.sprite = self.walk_right_sprite
@@ -363,6 +365,8 @@ class Near_Enemy(Human): #근거리
         if (self.viewdir == Vleft):
             self.position.x -= MOVE_SPEED
             self.sprite = self.walk_left_sprite
+            self.hitbox.move(self.position)
+            self.atk_hitbox.move(self.position)
         elif (self.viewdir == Vright):
             self.position.x += MOVE_SPEED
             self.sprite = self.walk_right_sprite
@@ -491,53 +495,156 @@ class Near_Enemy(Human): #근거리
 class Distance_Enemy(Human): #원거리
 
     def __init__(self):
-       super().__init__(hp = 250, mp = 0, atk = 15, arm = 5, cri = 0)
+        super().__init__(hp = 250, mp = 0, atk = 15, arm = 5, cri = 0)
+        self.position = vector(60, GROUND_HEIGHT)
+        self.speed = vector(0, 0) #속도. 매 프레임마다 위치+= 속도
+
+        self.motion = 0  #모션
+        self.viewdir = Vright #오른쪽
+        self.onGround = True #캐릭터가 땅 위에 존재
+
+        self.static_right_sprite = draw.sprite(['image/Enemy/static_D.png'], True, 1, self.position) #sprite 수정 필요
+        self.static_left_sprite = self.static_right_sprite.flip(True, False) #좌우 대칭
+        self.walk_right_sprite = draw.sprite(['image/Enemy/walk-' + str(i) + '_D.png' for i in range(1,5)], True, 6, self.position)
+        self.walk_left_sprite = self.walk_right_sprite.flip(True, False)
+        self.shoot_right_sprite = draw.sprite(['image/Enemy/slash_' + str(i) + '.png' for i in range(1,3)], True, 2, self.position)
+        self.shoot_left_sprite = self.slash_right_sprite.flip(True, False)
+        self.get_attack_right_sprite = draw.sprite(['image/Enemy/get_attack_1.png'], True, 3, self.position)
+        self.get_attack_left_sprite = self.get_attack_right_sprite.flip(True, False)
+
+        self.dead_right_sprite = draw.sprite(['image/Enemy/get_attack_3.png'], True, 2, self.position)
+        self.dead_left_sprite = self.dead_right_sprite.flip(True, False)
+
+        self.sprite = self.static_right_sprite
+
+        self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), 'static')
+        self.hitbox_atk = self.hitbox
+        self.stop()
 
     def jump(self): #점프
-        pass
+        self.atk_hitbox.check = False
+        if self.onGround:
+            self.onGround = False
+            self.speed.y = JUMP_SPEED
+            if self.viewdir == Vright:
+                self.sprite = self.static_right_sprite
+            if self.viewdir == Vleft:
+                self.sprite = self.static_left_sprite
 
     def left(self): #좌측 방향
-        pass
+        self.atk_hitbox.check = False
+        self.viewdir = Vleft
 
     def right(self): #우측 방향
-        pass
+        self.atk_hitbox.check = False
+        self.viewdir = Vright
 
     def walk(self): # 이동
-        pass
+        self.atk_hitbox.check = False
+        if (self.viewdir == Vleft):
+            self.position.x -= MOVE_SPEED
+            self.sprite = self.walk_left_sprite
+            self.hitbox.move(self.position)
+            self.atk_hitbox.move(self.position)
+        elif (self.viewdir == Vright):
+            self.position.x += MOVE_SPEED
+            self.sprite = self.walk_right_sprite
+            self.hitbox.move(self.position)
+            self.atk_hitbox.move(self.position)
 
     def stop(self): #멈춤
-        pass
+        self.atk_hitbox.check = False
+        self.speed.x = 0
+        if self.viewdir == Vright:
+            self.sprite = self.static_right_sprite
+        if self.viewdir == Vleft:
+            self.sprite = self.static_left_sprite
 
     def shoot(self ,other):
-        pass
+        self.atk_hitbox = True
 
     def get_attack(self, other, memo=''): #피격 판정. other:Human에게 (memo:str)형태로
-        pass
+        if (memo == 'attack'):
+            self.rigidity()
+            self.hp -= (other.atk - self.arm)
+            if other.cri <= random.random():
+                self.hp -= (other.atk * 2 - self.arm)
+            if(self.hp <= 0):
+                self.dead()
+        else:
+            pass
 
     def rigidity(self): #경직
-        pass
+        self.atk_hitbox.check = False
+        self.act = 'stun'
+        self.actframe = 10
+        if (self.viewdir == Vleft):
+            self.sprite = self.get_attack_left_sprite
+            self.position.x += 40
+        elif (self.viewdir == Vright):
+            self.sprite = self.get_attack_right_sprite
+            self.position.x -= 40
+        else:
 
     def distance_ai(self, other): #모션은 기존의 찌르기/베기 모션을 오버라이딩함.
-        pass
+        if (self.act != 'stop'):
+            return
+
+        dist = self.position.x - other.position.x
+        if 0 <= dist < 300:
+            self.right()
+            self.walk()
+        elif -300 < dist <= 0:
+            self.left()
+            self.walk()
+
+        elif dist >= 300:
+            pass
+        else:
+            pass
 
     def dead(self): #사망
-        pass
-
-    def distance_ai(self, other):#
-        pass
+        self.act = 'dead'
+        self.actframe = -1 # 1씩 감소하면 0이 될 일은 없으니까?? 테스트
+        self.atk_hitbox.check = False
+        self.hitbox.check = False
+        if self.hp <= 0:
+            if (self.viewdir == Vleft):
+                self.sprite = self.dead_left_sprite
+            elif (self.viewdir == Vright):
+                self.sprite = self.dead_right_sprite
+        else:
+            pass
 
     def update(self): #캐릭터 상태 업데이트: 캐릭터의 스텟이나 위치 등 상태만 업데이트 한다. 내부에서 이미지 업데이트를 부르지 말자.
-        pass
+        if(self.act != 'stop'):
+            self.actframe -= 1
+            if(self.actframe == 0):
+                self.act = 'stop'
+        self.hitbox.move(self.position)
+        self.hitbox.resize(*self.sprite.get_size())
+        self.position += self.speed
+        if not self.onGround:
+            self.speed += GRAVITY_CONSTANT
+        if(self.position.y > GROUND_HEIGHT):
+            self.onGround = True
+            self.position.y = GROUND_HEIGHT
+            self.speed = vector(0, 0)
+
+        if self.hp <= 0:
+            self.dead()
 
     def image_update(self): # 캐릭터 이미지 업데이트: 스프라이트 이미지만 업데이트 한다. 내부에서 상태 업데이트를 부르지 말자.
-        pass
+        self.sprite.move(self.position)
+        self.sprite.image_update()
 
-class Projectile: #투사체
+class Projectile: #투사체, 원거리 적 클래스를 불러와야 하나?
     def __init__(self):
-        self.sprite = None
-
-        self.position = None
+        self.position = Distance_Enemy().position
         self.speed = None
 
-        self.damage = None
+        self.sprite_right = draw.sprite(['image/Enemy_D/arrow.png'], True, 1, self.position)
+        self.sprite_left = self.sprite_right.flip(True, False)
+
+        self.damage = 10
         self.getGravity = False
