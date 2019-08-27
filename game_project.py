@@ -483,6 +483,12 @@ class Near_Enemy(Human): #근거리
         self.sting_cooltime -= 1
         self.slash_cooltime -= 1
         self.position += self.speed
+
+        if(self.position.x < MAP_LEFT_LIMIT): #self.position.left < MAP_LEFT_LIMIT
+            self.position.x = MAP_LEFT_LIMIT
+        if(self.position.x + self.sprite.get_size()[0] > MAP_RIGHT_LIMIT):
+            self.position.x = MAP_RIGHT_LIMIT - self.sprite.get_size()[0]
+
         if not self.onGround:
             self.speed += GRAVITY_CONSTANT
         if(self.position.y > GROUND_HEIGHT):
@@ -509,7 +515,7 @@ class Distance_Enemy(Human): #원거리
         self.static_left_sprite = self.static_right_sprite.flip(True, False) #좌우 대칭
         self.walk_right_sprite = draw.sprite(['image/Enemy_D/walk-' + str(i) + '_D.png' for i in range(1,5)], True, 6, self.position)
         self.walk_left_sprite = self.walk_right_sprite.flip(True, False)
-        self.shoot_right_sprite = draw.sprite(['image/Enemy/slash_' + str(i) + '.png' for i in range(1,3)], True, 2, self.position)
+        self.shoot_right_sprite = draw.sprite(['image/Enemy_D/shoot_' + str(i) + '.png' for i in range(1,3)], True, 2, self.position)
         self.shoot_left_sprite = self.shoot_right_sprite.flip(True, False)
         self.get_attack_right_sprite = draw.sprite(['image/Enemy/get_attack_1.png'], True, 3, self.position)
         self.get_attack_left_sprite = self.get_attack_right_sprite.flip(True, False)
@@ -518,6 +524,8 @@ class Distance_Enemy(Human): #원거리
         self.dead_left_sprite = self.dead_right_sprite.flip(True, False)
 
         self.sprite = self.static_right_sprite
+        self.shoot_cooltime = 0
+        self.default_shoot_cooltime = 30
 
         self.act = 'stop'
         self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), 'static')
@@ -563,8 +571,21 @@ class Distance_Enemy(Human): #원거리
         if self.viewdir == Vleft:
             self.sprite = self.static_left_sprite
 
-    def shoot(self ,other):
+    def shoot(self):
         self.atk_hitbox.check = True
+
+        if (self.shoot_cooltime > 0):
+            pass
+        else:
+            self.act = 'attack'
+            self.actframe = 6
+            self.shoot_cooltime = self.default_shoot_cooltime
+            if (self.viewdir == Vleft):
+                self.sprite = self.shoot_left_sprite
+            elif (self.viewdir == Vright):
+                self.sprite = self.shoot_right_sprite
+
+
 
     def get_attack(self, other, memo=''): #피격 판정. other:Human에게 (memo:str)형태로
         if (memo == 'attack'):
@@ -601,9 +622,13 @@ class Distance_Enemy(Human): #원거리
             self.walk()
 
         elif dist >= 300:
-            pass
+            self.left()
+            self.stop()
+            self.shoot()
         else:
-            pass
+            self.right()
+            self.stop()
+            self.shoot()
 
     def dead(self): #사망
         self.act = 'dead'
@@ -626,6 +651,12 @@ class Distance_Enemy(Human): #원거리
         self.hitbox.move(self.position)
         self.hitbox.resize(*self.sprite.get_size())
         self.position += self.speed
+
+        if(self.position.x < MAP_LEFT_LIMIT): #self.position.left < MAP_LEFT_LIMIT
+            self.position.x = MAP_LEFT_LIMIT
+        if(self.position.x + self.sprite.get_size()[0] > MAP_RIGHT_LIMIT):
+            self.position.x = MAP_RIGHT_LIMIT - self.sprite.get_size()[0]
+
         if not self.onGround:
             self.speed += GRAVITY_CONSTANT
         if(self.position.y > GROUND_HEIGHT):
