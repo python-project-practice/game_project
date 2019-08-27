@@ -109,7 +109,6 @@ while running: #프로그램 전체를 담당하는 반복문.
 
     units['enemy'].append(unit.nearenemySet(Near_Enemy()))
     units['enemy'].append(unit.farenemySet(Distance_Enemy(position=(600, GROUND_HEIGHT))))
-    units['projectile'].append(unit.projectileSet(Projectile(position=(game_project.Projectile.position), speed=(6, 0), damage=0, getGravity=False)))
     # units['enemy'].append(unit.nearenemySet(Near_Enemy(position=(550,GROUND_HEIGHT))))
 
 
