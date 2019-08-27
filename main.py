@@ -52,7 +52,6 @@ chooserect.center = (WIDTH / 2 , HEIGHT * (35 / 100))
 
 units = {}
 
-
 def gameoverEvent():
     global running # 전역변수 running을 쓴다. 명시하지 않으면 메소드에 속한 임시변수 running을 만든다.
     while True:

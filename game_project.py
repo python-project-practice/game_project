@@ -504,7 +504,7 @@ class Distance_Enemy(Human): #원거리
 
     def __init__(self, hp = 250, mp = 0, atk = 15, arm = 5, cri = 0, position = (600,GROUND_HEIGHT)):
         super().__init__(hp, mp, atk, arm, cri)
-        self.position = vector(60, GROUND_HEIGHT)
+        self.position = vector(*position)
         self.speed = vector(0, 0) #속도. 매 프레임마다 위치+= 속도
 
         self.motion = 0  #모션
