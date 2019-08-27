@@ -33,7 +33,7 @@ Vleft = 'view_left'
 Vright = 'view_right'
 
 MOVE_SPEED = 6
-GROUND_HEIGHT = 350
+GROUND_HEIGHT = 500
 MAP_LEFT_LIMIT = 0
 MAP_RIGHT_LIMIT = 800
 
@@ -301,9 +301,9 @@ class Character(Human):
 
         if not self.onGround:
             self.speed += GRAVITY_CONSTANT
-        if(self.position.y > GROUND_HEIGHT):
+        if(self.position.y + self.sprite.get_size()[1] > GROUND_HEIGHT):
             self.onGround = True
-            self.position.y = GROUND_HEIGHT
+            self.position.y = GROUND_HEIGHT - self.sprite.get_size()[1]
             self.speed = vector(0, 0)
 
 
@@ -491,9 +491,9 @@ class Near_Enemy(Human): #근거리
 
         if not self.onGround:
             self.speed += GRAVITY_CONSTANT
-        if(self.position.y > GROUND_HEIGHT):
+        if(self.position.y + self.sprite.get_size()[1] > GROUND_HEIGHT):
             self.onGround = True
-            self.position.y = GROUND_HEIGHT
+            self.position.y = GROUND_HEIGHT - self.sprite.get_size()[1]
             self.speed = vector(0, 0)
 
         if self.hp <= 0:
@@ -661,9 +661,9 @@ class Distance_Enemy(Human): #원거리
 
         if not self.onGround:
             self.speed += GRAVITY_CONSTANT
-        if(self.position.y > GROUND_HEIGHT):
+        if(self.position.y + self.sprite.get_size()[1] > GROUND_HEIGHT):
             self.onGround = True
-            self.position.y = GROUND_HEIGHT
+            self.position.y = GROUND_HEIGHT - self.sprite.get_size()[1]
             self.speed = vector(0, 0)
 
         if self.hp <= 0:
