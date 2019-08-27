@@ -130,6 +130,9 @@ class painter:
         self.surfsize = surf.get_size()
         self.bg = None
         self.__updatelist = []
+
+    def reset(self):
+        self._updatelist = []
         
     def append_bg(self, item, alpha=False):
         bg = image(item, alpha)

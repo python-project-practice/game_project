@@ -26,6 +26,7 @@ from collision import hitbox
 from vector import vector
 import time
 import UI
+import unit
 
 #++ 히트박스 클래스 고려하여 프로그래밍 ㄱㄱ
 
@@ -584,6 +585,9 @@ class Distance_Enemy(Human): #원거리
                 self.sprite = self.shoot_left_sprite
             elif (self.viewdir == Vright):
                 self.sprite = self.shoot_right_sprite
+            arrow = unit.projectileSet(Projectile(self.position, (-3, 0), 10, False))
+            unit.units['projectile'].append(arrow)
+            unit.painter.append(arrow)
 
     def get_attack(self, other, memo=''): #피격 판정. other:Human에게 (memo:str)형태로
         if (memo == 'attack'):
@@ -648,6 +652,8 @@ class Distance_Enemy(Human): #원거리
                 self.act = 'stop'
         self.hitbox.move(self.position)
         self.hitbox.resize(*self.sprite.get_size())
+        self.atk_hitbox.move(self.position)
+        self.atk_hitbox.resize(*self.sprite.get_size())
         self.position += self.speed
 
         if(self.position.x < MAP_LEFT_LIMIT): #self.position.left < MAP_LEFT_LIMIT

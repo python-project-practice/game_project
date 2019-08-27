@@ -1,7 +1,11 @@
 ﻿import game_project
+import pygame
 import UI
 import draw
 from abc import *
+
+units = {'enemy':[], 'projectile':[]}
+painter = None
 
 class unitSet(draw.drawable, metaclass=ABCMeta): #지금은 하는 것은 없다. 유닛 하나와 관련된 것을 다루는 클래스임을 명시.
     def draw(self, surf):

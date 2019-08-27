@@ -25,8 +25,9 @@ BLACK = (0, 0, 0)
 pygame.init()
 DISP = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("액션 게임")
-
-
+unit.painter = draw.painter(DISP)
+painter = unit.painter
+units = unit.units
 ############################################################################################
 #게임 전반적으로 쓰이는 변수/ 폰트 등을 지정한다. 게임을 재시작해도 새로 불러올 필요가 없다.
 ############################################################################################ 
@@ -50,7 +51,6 @@ retryrect.center = (WIDTH / 2, HEIGHT / 4)
 youwinrect.center = (WIDTH / 2, HEIGHT * 0.15)
 chooserect.center = (WIDTH / 2 , HEIGHT * (35 / 100))
 
-units = {}
 
 def gameoverEvent():
     global running # 전역변수 running을 쓴다. 명시하지 않으면 메소드에 속한 임시변수 running을 만든다.
@@ -90,10 +90,10 @@ while running: #프로그램 전체를 담당하는 반복문.
 #############################################################################################
 #한 게임마다 초기화해야 하는 것들을 담당한다. 플레이어나, 적이나 그런 것들.
 #############################################################################################
-    painter = draw.painter(DISP)
+    painter.reset()
     painter.append_bg('image/MapSunny.png')
-    units = {'enemy':[], 'projectile':[]} #각각의 유닛을 종류별로 리스트에 담고, 리스트를 하나의 딕셔너리에 넣어 관리.
-                                     #플레이어는 단 하나의 값만 가지므로 리스트에 쓰기는 부담스럽고, 따라서 units딕셔너리엔 넣지 않았다.
+    units['enemy'] = []
+    units['projectile'] = []
     
     #트리 형태로 보면 다음과 같다.
     #units(Dict)->enemy(list)->nearenemySet->Near_Enemy
@@ -155,6 +155,7 @@ while running: #프로그램 전체를 담당하는 반복문.
                 units['projectile'].remove(proj)
                 painter.remove(proj)
                 del proj
+
         collide_list_to_list(hitbox_layer['player_attack'], hitbox_layer['enemy'])
         collide_list_to_list(hitbox_layer['player'], hitbox_layer['enemy_attack'])
 
