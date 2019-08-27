@@ -481,6 +481,7 @@ class Near_Enemy(Human): #근거리
         self.atk_hitbox.move(self.position)
         self.atk_hitbox.resize(*self.sprite.get_size())
         self.sting_cooltime -= 1
+        self.slash_cooltime -= 1
         self.position += self.speed
         if not self.onGround:
             self.speed += GRAVITY_CONSTANT
@@ -640,12 +641,34 @@ class Distance_Enemy(Human): #원거리
         self.sprite.image_update()
 
 class Projectile: #투사체, 원거리 적 클래스를 불러와야 하나?
-    def __init__(self):
-        self.position = Distance_Enemy().position
-        self.speed = None
+    def __init__(self, position, speed, damage, getGravity=False):
+        self.position = vector(*position)
+        self.speed = vector(*speed)
 
         self.sprite_right = draw.sprite(['image/Enemy_D/arrow.png'], True, 1, self.position)
         self.sprite_left = self.sprite_right.flip(True, False)
+        if(self.speed.x < 0): #왼쪽으로 날아가고 있을 때
+            self.sprite = self.sprite_left
+        else:
+            self.sprite = self.sprite_right
+        self.viewdir = Vright
 
-        self.damage = 10
-        self.getGravity = False
+        self.damage = damage
+        self.getGravity = getGravity
+        self.hitbox = hitbox(self, *self.position, *self.sprite.get_size(), 'attack')
+
+    def update(self):
+        if(self.getGravity):
+            self.speed += GRAVITY_CONSTANT
+        self.position += self.speed
+        self.sprite.move(self.position)
+
+    def image_update(self):
+        pass
+
+    def draw(self, surf):
+        self.sprite.draw(surf)
+
+    def get_attack(self):
+        pass
+

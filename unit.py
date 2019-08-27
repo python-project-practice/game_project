@@ -49,3 +49,18 @@ class farenemySet(unitSet):
 
     def update(self):
         return self.character.update()
+
+class projectileSet(unitSet):
+    def __init__(self, enemy):
+        assert isinstance(enemy, game_project.Projectile)
+        self.character = enemy
+        self.UI = None
+
+    def image_update(self):
+        self.character.image_update()
+
+    def draw(self, surf):
+        self.character.draw(surf)
+
+    def update(self):
+        self.character.update()

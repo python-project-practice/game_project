@@ -143,6 +143,9 @@ class painter:
                                           # 그렇지 않으면 TypeError가 발생한다.
         self.__updatelist.append(item)
 
+    def remove(self, item):
+        self.__updatelist.remove(item)
+
     def draw(self):
         for i in self.__updatelist:
             i.draw(self.surf)

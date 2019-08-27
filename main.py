@@ -50,6 +50,8 @@ retryrect.center = (WIDTH / 2, HEIGHT / 4)
 youwinrect.center = (WIDTH / 2, HEIGHT * 0.15)
 chooserect.center = (WIDTH / 2 , HEIGHT * (35 / 100))
 
+units = {}
+
 
 def gameoverEvent():
     global running # 전역변수 running을 쓴다. 명시하지 않으면 메소드에 속한 임시변수 running을 만든다.
@@ -90,7 +92,7 @@ while running: #프로그램 전체를 담당하는 반복문.
 #############################################################################################
     painter = draw.painter(DISP)
     painter.append_bg('image/MapSunny.png')
-    units = {'enemy':[], 'items':[]} #각각의 유닛을 종류별로 리스트에 담고, 리스트를 하나의 딕셔너리에 넣어 관리.
+    units = {'enemy':[], 'projectile':[]} #각각의 유닛을 종류별로 리스트에 담고, 리스트를 하나의 딕셔너리에 넣어 관리.
                                      #플레이어는 단 하나의 값만 가지므로 리스트에 쓰기는 부담스럽고, 따라서 units딕셔너리엔 넣지 않았다.
     
     #트리 형태로 보면 다음과 같다.
@@ -106,6 +108,8 @@ while running: #프로그램 전체를 담당하는 반복문.
 
     units['enemy'].append(unit.nearenemySet(Near_Enemy()))
     units['enemy'].append(unit.farenemySet(Distance_Enemy(position=(600, GROUND_HEIGHT))))
+    units['projectile'].append(unit.projectileSet(Projectile(position=(300, 100), speed=(6, 0), damage=0, getGravity=False)))
+    units['projectile'].append(unit.projectileSet(Projectile(position=(300, 100), speed=(2, 0), damage=0, getGravity=True)))
     # units['enemy'].append(unit.nearenemySet(Near_Enemy(position=(550,GROUND_HEIGHT))))
 
 
@@ -124,8 +128,7 @@ while running: #프로그램 전체를 담당하는 반복문.
                     'player_attack':[player.character.atk_hitbox],
                     'enemy' :       [i.character.hitbox for i in units['enemy']],
                     'enemy_attack': [i.character.atk_hitbox  for i in units['enemy']],
-                    'item':         [],
-                    'throwable':    []
+                    'projectile':   [i.character.hitbox for i in units['projectile']]
                     }
 
     playing = True  #게임이 계속 실행중인지 여부
@@ -146,7 +149,12 @@ while running: #프로그램 전체를 담당하는 반복문.
             enemy.ai(player.character)
             enemy.update()
 
-        collide_list_to_list(hitbox_layer['player'], hitbox_layer['enemy'])
+        for proj in units['projectile']:
+            proj.update()
+            if(not 0 < proj.character.position.x < WIDTH or proj.character.position.y > GROUND_HEIGHT):
+                units['projectile'].remove(proj)
+                painter.remove(proj)
+                del proj
         collide_list_to_list(hitbox_layer['player_attack'], hitbox_layer['enemy'])
         collide_list_to_list(hitbox_layer['player'], hitbox_layer['enemy_attack'])
 
@@ -159,7 +167,7 @@ while running: #프로그램 전체를 담당하는 반복문.
             gameoverEvent()
 
         else:
-            if(all(i.character.act == 'dead' for i in units['enemy'])):
+            if(all(i.character.act == 'dead' for i in units['enemy'])): #적이 모두 죽으면 승리
                 playing = False
                 winEvent()
 
@@ -174,8 +182,7 @@ while running: #프로그램 전체를 담당하는 반복문.
 ################################################################################################
 #사용했던 것들을 날린다.
 ################################################################################################
-    for item in units:
-        del item
+    del units
     del player
     del painter
 pygame.quit()
