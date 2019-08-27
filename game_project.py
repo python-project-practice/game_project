@@ -619,7 +619,7 @@ class Distance_Enemy(Human): #원거리
             self.left()
             self.walk()
 
-        elif dist >= 300 or self.position.x < MAP_RIGHT_LIMIT:
+        elif dist >= 300 and self.position.x < MAP_RIGHT_LIMIT:
             self.left()
             self.stop()
             self.shoot()
