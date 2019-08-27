@@ -7,6 +7,7 @@ import game_project
 from game_project import Character, Near_Enemy, Distance_Enemy, Projectile, GROUND_HEIGHT
 from collision import collide_list_to_list
 import unit
+import vector
 
 '''
 800*600 크기. 카메라 무브 없이 한 맵에서 1:1 내지는 1:3 정도의 전투를 한다.
@@ -108,8 +109,7 @@ while running: #프로그램 전체를 담당하는 반복문.
 
     units['enemy'].append(unit.nearenemySet(Near_Enemy()))
     units['enemy'].append(unit.farenemySet(Distance_Enemy(position=(600, GROUND_HEIGHT))))
-    units['projectile'].append(unit.projectileSet(Projectile(position=(300, 100), speed=(6, 0), damage=0, getGravity=False)))
-    units['projectile'].append(unit.projectileSet(Projectile(position=(300, 100), speed=(2, 0), damage=0, getGravity=True)))
+    units['projectile'].append(unit.projectileSet(Projectile(position=(game_project.Projectile.position), speed=(6, 0), damage=0, getGravity=False)))
     # units['enemy'].append(unit.nearenemySet(Near_Enemy(position=(550,GROUND_HEIGHT))))
 
 
@@ -187,4 +187,3 @@ while running: #프로그램 전체를 담당하는 반복문.
     del player
     del painter
 pygame.quit()
-
