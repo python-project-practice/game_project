@@ -144,7 +144,7 @@ class Character(Human):
         self.slash_cooltime = 0
         self.default_slash_cooltime = 30
 
-        self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), memo="body")
+        self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), memo="static")
         self.atk_hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), memo="attack", check=False)
         self.stop() #stop 상태로 초기화
         
@@ -291,6 +291,7 @@ class Character(Human):
             if(self.actframe == 0):
                 self.act = 'stop'
         self.sting_cooltime -= 1
+        self.slash_cooltime -= 1
 
         self.position += self.speed
         if(self.position.x < MAP_LEFT_LIMIT): #self.position.left < MAP_LEFT_LIMIT
@@ -494,8 +495,8 @@ class Near_Enemy(Human): #근거리
 
 class Distance_Enemy(Human): #원거리
 
-    def __init__(self):
-        super().__init__(hp = 250, mp = 0, atk = 15, arm = 5, cri = 0)
+    def __init__(self, hp = 250, mp = 0, atk = 15, arm = 5, cri = 0, position = (600,GROUND_HEIGHT)):
+        super().__init__(hp, mp, atk, arm, cri)
         self.position = vector(60, GROUND_HEIGHT)
         self.speed = vector(0, 0) #속도. 매 프레임마다 위치+= 속도
 
@@ -503,12 +504,12 @@ class Distance_Enemy(Human): #원거리
         self.viewdir = Vright #오른쪽
         self.onGround = True #캐릭터가 땅 위에 존재
 
-        self.static_right_sprite = draw.sprite(['image/Enemy/static_D.png'], True, 1, self.position) #sprite 수정 필요
+        self.static_right_sprite = draw.sprite(['image/Enemy_D/static_D.png'], True, 1, self.position) #sprite 수정 필요
         self.static_left_sprite = self.static_right_sprite.flip(True, False) #좌우 대칭
-        self.walk_right_sprite = draw.sprite(['image/Enemy/walk-' + str(i) + '_D.png' for i in range(1,5)], True, 6, self.position)
+        self.walk_right_sprite = draw.sprite(['image/Enemy_D/walk-' + str(i) + '_D.png' for i in range(1,5)], True, 6, self.position)
         self.walk_left_sprite = self.walk_right_sprite.flip(True, False)
         self.shoot_right_sprite = draw.sprite(['image/Enemy/slash_' + str(i) + '.png' for i in range(1,3)], True, 2, self.position)
-        self.shoot_left_sprite = self.slash_right_sprite.flip(True, False)
+        self.shoot_left_sprite = self.shoot_right_sprite.flip(True, False)
         self.get_attack_right_sprite = draw.sprite(['image/Enemy/get_attack_1.png'], True, 3, self.position)
         self.get_attack_left_sprite = self.get_attack_right_sprite.flip(True, False)
 
@@ -517,8 +518,9 @@ class Distance_Enemy(Human): #원거리
 
         self.sprite = self.static_right_sprite
 
+        self.act = 'stop'
         self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), 'static')
-        self.hitbox_atk = self.hitbox
+        self.atk_hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), 'attack')
         self.stop()
 
     def jump(self): #점프
@@ -561,7 +563,7 @@ class Distance_Enemy(Human): #원거리
             self.sprite = self.static_left_sprite
 
     def shoot(self ,other):
-        self.atk_hitbox = True
+        self.atk_hitbox.check = True
 
     def get_attack(self, other, memo=''): #피격 판정. other:Human에게 (memo:str)형태로
         if (memo == 'attack'):
@@ -581,10 +583,9 @@ class Distance_Enemy(Human): #원거리
         if (self.viewdir == Vleft):
             self.sprite = self.get_attack_left_sprite
             self.position.x += 40
-        elif (self.viewdir == Vright):
+        else:
             self.sprite = self.get_attack_right_sprite
             self.position.x -= 40
-        else:
 
     def distance_ai(self, other): #모션은 기존의 찌르기/베기 모션을 오버라이딩함.
         if (self.act != 'stop'):

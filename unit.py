@@ -19,11 +19,12 @@ class characterSet(unitSet): #캐릭터와 캐릭터 UI등 하나의 캐릭터�
         self.character = character
         self.UI = UI.Character_stat(self.character, pos=(5, 5)) #UI는 알아서 생성한다.
 
+    def control(self, keys):
+        return self.character.control(keys)
+
     def update(self):
         return self.character.update()
 
-    def control(self, keys):
-        return self.character.control(keys)
 
 class nearenemySet(unitSet): #근거리 공격 적과 그 UI등 하나의 근거리 적과 관련된 모든 것을 포함, 관리하는 클래스.
     def __init__(self, enemy): #적과 UI 속성 등을 넣어주면 그걸 토대로 클래스를 초기화한다. UI생성방법은 모두 동일하니 고정.
@@ -33,6 +34,18 @@ class nearenemySet(unitSet): #근거리 공격 적과 그 UI등 하나의 근거
     
     def ai(self, other):
         return self.character.near_ai(other)
+
+    def update(self):
+        return self.character.update()
+
+class farenemySet(unitSet):
+    def __init__(self, enemy):
+        assert isinstance(enemy, game_project.Distance_Enemy)
+        self.character = enemy
+        self.UI = UI.Enemy_stat(self.character, pos=(0,180))
+
+    def ai(self, other):
+        return self.character.distance_ai(other)
 
     def update(self):
         return self.character.update()

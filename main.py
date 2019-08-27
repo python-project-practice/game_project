@@ -3,7 +3,8 @@ from pygame.locals import *
 import draw
 
 import UI
-from game_project import Character, Near_Enemy, GROUND_HEIGHT
+import game_project
+from game_project import Character, Near_Enemy, Distance_Enemy, Projectile, GROUND_HEIGHT
 from collision import collide_list_to_list
 import unit
 
@@ -104,6 +105,7 @@ while running: #프로그램 전체를 담당하는 반복문.
 
 
     units['enemy'].append(unit.nearenemySet(Near_Enemy()))
+    units['enemy'].append(unit.farenemySet(Distance_Enemy(position=(600, GROUND_HEIGHT))))
     # units['enemy'].append(unit.nearenemySet(Near_Enemy(position=(550,GROUND_HEIGHT))))
 
 
@@ -157,12 +159,10 @@ while running: #프로그램 전체를 담당하는 반복문.
             gameoverEvent()
 
         else:
-            for i in units['enemy']: 
-                if i.character.act != 'dead':
-                    break
-            #적이 모두 죽었고 나는 살았으면 승리
+            if(all(i.character.act == 'dead' for i in units['enemy'])):
                 playing = False
                 winEvent()
+
     
         fps = clock.get_fps()
         fpsmsg = gulim.render('fps: ' + str(int(fps)), 1, BLACK, WHITE)
