@@ -578,7 +578,7 @@ class Distance_Enemy(Human): #원거리
             pass
         else:
             self.act = 'attack'
-            self.actframe = 6
+            self.actframe = 3
             self.shoot_cooltime = self.default_shoot_cooltime
             if (self.viewdir == Vleft):
                 self.sprite = self.shoot_left_sprite
@@ -656,6 +656,8 @@ class Distance_Enemy(Human): #원거리
             self.position.x = MAP_LEFT_LIMIT
         if(self.position.x + self.sprite.get_size()[0] > MAP_RIGHT_LIMIT):
             self.position.x = MAP_RIGHT_LIMIT - self.sprite.get_size()[0]
+        
+        self.shoot_cooltime -= 1
 
         if not self.onGround:
             self.speed += GRAVITY_CONSTANT
