@@ -585,8 +585,6 @@ class Distance_Enemy(Human): #원거리
             elif (self.viewdir == Vright):
                 self.sprite = self.shoot_right_sprite
 
-
-
     def get_attack(self, other, memo=''): #피격 판정. other:Human에게 (memo:str)형태로
         if (memo == 'attack'):
             self.rigidity()
@@ -621,7 +619,7 @@ class Distance_Enemy(Human): #원거리
             self.left()
             self.walk()
 
-        elif dist >= 300:
+        elif dist >= 300 or self.position.x < MAP_RIGHT_LIMIT:
             self.left()
             self.stop()
             self.shoot()
@@ -704,4 +702,3 @@ class Projectile: #투사체, 원거리 적 클래스를 불러와야 하나?
 
     def get_attack(self):
         pass
-
