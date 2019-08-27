@@ -27,8 +27,6 @@ pygame.init()
 DISP = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("액션 게임")
 unit.painter = draw.painter(DISP)
-painter = unit.painter
-units = unit.units
 ############################################################################################
 #게임 전반적으로 쓰이는 변수/ 폰트 등을 지정한다. 게임을 재시작해도 새로 불러올 필요가 없다.
 ############################################################################################ 
@@ -91,6 +89,9 @@ while running: #프로그램 전체를 담당하는 반복문.
 #############################################################################################
 #한 게임마다 초기화해야 하는 것들을 담당한다. 플레이어나, 적이나 그런 것들.
 #############################################################################################
+
+    painter = unit.painter
+    units = unit.units
     painter.reset()
     painter.append_bg('image/MapSunny.png')
     units['enemy'] = []
@@ -131,7 +132,6 @@ while running: #프로그램 전체를 담당하는 반복문.
                     }
 
     playing = True  #게임이 계속 실행중인지 여부
-
 ############################################################################################
 #실제 게임을 시작한다.
 ############################################################################################
@@ -154,9 +154,10 @@ while running: #프로그램 전체를 담당하는 반복문.
                 units['projectile'].remove(proj)
                 painter.remove(proj)
                 del proj
-
+        hitbox_layer['projectile'] = [i.character.hitbox for i in units['projectile']]
         collide_list_to_list(hitbox_layer['player_attack'], hitbox_layer['enemy'])
         collide_list_to_list(hitbox_layer['player'], hitbox_layer['enemy_attack'])
+        collide_list_to_list(hitbox_layer['player'], hitbox_layer['projectile'])
 
         painter.image_update()
         painter.draw()

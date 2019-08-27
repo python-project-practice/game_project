@@ -526,7 +526,7 @@ class Distance_Enemy(Human): #원거리
 
         self.sprite = self.static_right_sprite
         self.shoot_cooltime = 0
-        self.default_shoot_cooltime = 30
+        self.default_shoot_cooltime = 90
 
         self.act = 'stop'
         self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), 'static')
@@ -583,9 +583,10 @@ class Distance_Enemy(Human): #원거리
             self.shoot_cooltime = self.default_shoot_cooltime
             if (self.viewdir == Vleft):
                 self.sprite = self.shoot_left_sprite
+                arrow = unit.projectileSet(Projectile(self.position + (0, 60), (-6, 0), 10, False))
             elif (self.viewdir == Vright):
                 self.sprite = self.shoot_right_sprite
-            arrow = unit.projectileSet(Projectile(self.position, (-3, 0), 10, False))
+                arrow = unit.projectileSet(Projectile(self.position + (0, 60), (6, 0), 10, False))
             unit.units['projectile'].append(arrow)
             unit.painter.append(arrow)
 
@@ -690,21 +691,24 @@ class Projectile: #투사체, 원거리 적 클래스를 불러와야 하나?
             self.sprite = self.sprite_right
         self.viewdir = Vright
 
-        self.damage = damage
+        self.atk = damage
+        self.cri = 0
         self.getGravity = getGravity
-        self.hitbox = hitbox(self, *self.position, *self.sprite.get_size(), 'attack')
+        self.hitbox = hitbox(self, self.position.x, self.position.y, *self.sprite.get_size(), 'attack')
 
     def update(self):
         if(self.getGravity):
             self.speed += GRAVITY_CONSTANT
         self.position += self.speed
         self.sprite.move(self.position)
+        self.hitbox.move(self.position)
 
     def image_update(self):
         pass
 
     def draw(self, surf):
         self.sprite.draw(surf)
+        self.hitbox.draw(surf)
 
-    def get_attack(self):
+    def get_attack(self, other, memo=''):
         pass

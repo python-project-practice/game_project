@@ -132,7 +132,8 @@ class painter:
         self.__updatelist = []
 
     def reset(self):
-        self._updatelist = []
+        del self.__updatelist
+        self.__updatelist = []
         
     def append_bg(self, item, alpha=False):
         bg = image(item, alpha)
