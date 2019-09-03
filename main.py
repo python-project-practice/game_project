@@ -154,6 +154,7 @@ while running: #프로그램 전체를 담당하는 반복문.
                 units['projectile'].remove(proj)
                 painter.remove(proj)
                 del proj
+
         hitbox_layer['projectile'] = [i.character.hitbox for i in units['projectile']]
         collide_list_to_list(hitbox_layer['player_attack'], hitbox_layer['enemy'])
         collide_list_to_list(hitbox_layer['player'], hitbox_layer['enemy_attack'])
@@ -161,7 +162,6 @@ while running: #프로그램 전체를 담당하는 반복문.
 
         painter.image_update()
         painter.draw()
-
 
         if player.character.hp <= 0: #게임오버. 내가 죽으면서 적을 모두 죽였어도 게임오버(승리x).
             playing = False

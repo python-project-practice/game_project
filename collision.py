@@ -29,7 +29,6 @@ class hitbox(pygame.Rect):
         surf.blit(name, (self.x + self.width / 2 - namerect.width / 2, self.y))
         pygame.draw.rect(surf, self.debugColor, self, 1)
 
-
 def collide_list_to_list(list1, list2): #히트박스로 이루어진 리스트
     for i in list1:
         if(i.check):

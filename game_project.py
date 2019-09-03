@@ -583,10 +583,10 @@ class Distance_Enemy(Human): #원거리
             self.shoot_cooltime = self.default_shoot_cooltime
             if (self.viewdir == Vleft):
                 self.sprite = self.shoot_left_sprite
-                arrow = unit.projectileSet(Projectile(self.position + (0, 60), (-6, 0), 10, False))
+                arrow = unit.projectileSet(Projectile(self.position + (0, 60), (-12, 0), self.atk, False))
             elif (self.viewdir == Vright):
                 self.sprite = self.shoot_right_sprite
-                arrow = unit.projectileSet(Projectile(self.position + (0, 60), (6, 0), 10, False))
+                arrow = unit.projectileSet(Projectile(self.position + (0, 60), (12, 0), self.atk, False))
             unit.units['projectile'].append(arrow)
             unit.painter.append(arrow)
 
